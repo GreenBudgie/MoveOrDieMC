@@ -29,30 +29,30 @@ public class LobbyParkourHandler implements Listener {
 		LobbyParkour easy = new LobbyParkour();
 		easy.setName(ChatColor.GREEN + "Изи");
 		easy.setStartLocation(new Location(lobby, 24, 11, -1));
-		easy.setFinishLocation(new Location(lobby, 32, 20, -16));
+		easy.setFinishLocation(new Location(lobby, 34, 19, -18));
 		easy.setCheckpointLocation(new Location(lobby, 21.5, 10, 2.5, 225, 0));
 		easy.setSignLocation(new Location(lobby, 23, 10, 1));
 
 		LobbyParkour medium = new LobbyParkour();
 		medium.setName(ChatColor.DARK_GREEN + "Средний");
 		medium.setStartLocation(new Location(lobby, -11, 11, -2));
-		medium.setFinishLocation(new Location(lobby, -16, 23, -16));
+		medium.setFinishLocation(new Location(lobby, -21, 25, -19));
 		medium.setCheckpointLocation(new Location(lobby, -6.5, 10, 2.5, 135, 0));
 		medium.setSignLocation(new Location(lobby, -9, 10, 1));
 
 		LobbyParkour hard = new LobbyParkour();
 		hard.setName(ChatColor.DARK_BLUE + "Сложный");
-		hard.setStartLocation(new Location(lobby, 24, 22, -19));
+		hard.setStartLocation(new Location(lobby, 25, 24, -19));
 		hard.setFinishLocation(new Location(lobby, 16, 26, -20));
-		hard.setCheckpointLocation(new Location(lobby, 24.5, 21, -15.5, 180, 0));
-		hard.setSignLocation(new Location(lobby, 24, 21, -18));
+		hard.setCheckpointLocation(new Location(lobby, 25.5, 23, -15.5, 180, 0));
+		hard.setSignLocation(new Location(lobby, 25, 23, -18));
 
 		LobbyParkour insane = new LobbyParkour();
 		insane.setName(ChatColor.DARK_RED + "Дикий");
-		insane.setStartLocation(new Location(lobby, -10, 22, -19));
+		insane.setStartLocation(new Location(lobby, -12, 24, -19));
 		insane.setFinishLocation(new Location(lobby, -2, 26, -20));
-		insane.setCheckpointLocation(new Location(lobby, -9.5, 21, -15.5, 180, 0));
-		insane.setSignLocation(new Location(lobby, -10, 21, -18));
+		insane.setCheckpointLocation(new Location(lobby, -11.5, 23, -15.5, 180, 0));
+		insane.setSignLocation(new Location(lobby, -12, 23, -18));
 
 		LobbyParkour ice = new LobbyParkour();
 		ice.setName(ChatColor.AQUA + "Ледовый");
@@ -150,7 +150,7 @@ public class LobbyParkourHandler implements Listener {
 		if(PlayerHandler.isInLobby(player) && player.getActivePotionEffects().isEmpty()) {
 			for(LobbyParkour parkour : parkours) {
 				if(WorldUtils.compareIntegerLocations(parkour.getStartLocation(), player.getLocation())) {
-					if(!isPassing(player)) {
+					if(!isPassing(player, parkour)) {
 						startPassing(player, parkour);
 					}
 					toUpdate.add(player);
