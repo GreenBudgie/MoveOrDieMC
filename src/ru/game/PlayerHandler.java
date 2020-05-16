@@ -1,5 +1,6 @@
 package ru.game;
 
+import com.google.common.collect.Sets;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -11,12 +12,18 @@ import ru.util.EntityUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class PlayerHandler implements Listener {
 
 	private static List<MDPlayer> players = new ArrayList<>();
 
-	public static List<MDPlayer> getPlayers() {
+	public static List<Player> getPlayers() {
+		return players.stream().map(MDPlayer::getPlayer).collect(Collectors.toList());
+	}
+
+	public static List<MDPlayer> getMDPlayers() {
 		return players;
 	}
 

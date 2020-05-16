@@ -4,7 +4,7 @@ import java.util.stream.Stream;
 
 public enum GameState {
 
-	STOPPED, SETUP, MUTATOR, GAME, FINALE;
+	STOPPED, SETUP, ROUND_END, MUTATOR, GAME, FINALE;
 
 	public void set() {
 		setState(this);

@@ -17,7 +17,7 @@ public abstract class Mutator {
 	}
 
 	public final boolean isActive() {
-		return false; //TODO
+		return this == MutatorManager.getActiveMutator();
 	}
 
 	public void onDeactivate() {

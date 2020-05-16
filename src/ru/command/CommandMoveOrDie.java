@@ -20,7 +20,7 @@ public class CommandMoveOrDie implements CommandExecutor, TabCompleter {
 
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if(!sender.isOp()) return true;
-		Player p = (Player) sender;
+		Player player = (Player) sender;
 		if(args[0].equalsIgnoreCase("start")) {
 			MoveOrDie.startGame();
 		}
@@ -28,9 +28,9 @@ public class CommandMoveOrDie implements CommandExecutor, TabCompleter {
 			MoveOrDie.endGame();
 		}
 		if(args[0].equalsIgnoreCase("mainworld")) {
-			p.setGameMode(GameMode.CREATIVE);
-			p.setFlying(true);
-			p.teleport(WorldManager.getOriginalGameWorld().getSpawnLocation());
+			player.setGameMode(GameMode.CREATIVE);
+			player.setFlying(true);
+			player.teleport(WorldManager.getOriginalGameWorld().getSpawnLocation());
 		}
 		if(args[0].equalsIgnoreCase("parkour_reset")) {
 			for(LobbyParkour parkour : LobbyParkourHandler.parkours) {
@@ -41,13 +41,16 @@ public class CommandMoveOrDie implements CommandExecutor, TabCompleter {
 				sign.update();
 			}
 		}
+		if(args[0].equalsIgnoreCase("effects")) {
+			MoveOrDie.giveDefaultEffects(player);
+		}
 		return true;
 	}
 
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
 		if(args.length == 1) {
-			return getMatchingStrings(args, "start", "stop", "mainworld", "parkour_reset");
+			return getMatchingStrings(args, "start", "end", "mainworld", "parkour_reset", "effects");
 		}
 		return null;
 	}

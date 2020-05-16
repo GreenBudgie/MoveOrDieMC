@@ -36,6 +36,17 @@ public class EntityUtils {
 	}
 
 	/**
+	 * Teleports an entity to the center of the given location. Ex: coordinates 15 24 20 will be converted to 15.5 25 20.5
+	 * @param ent An entity
+	 * @param to Location to teleport
+	 * @param saveYaw Whether to save entity's yaw rotation
+	 * @param savePitch Whether to save entity's pitch rotation
+	 */
+	public static void teleportCentered(LivingEntity ent, Location to, boolean saveYaw, boolean savePitch) {
+		teleport(ent, to.clone().add(0.5, 0, 0.5), saveYaw, savePitch);
+	}
+
+	/**
 	 * Applies potion effect to the given entity if this effect has larger amplifier or the same amplifier and bigger duration
 	 * @param e Entity to apply effect for
 	 * @param effect An effect to apply

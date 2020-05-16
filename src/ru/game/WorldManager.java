@@ -43,10 +43,16 @@ public class WorldManager {
 		}
 	}
 
+	public static void makeWorld() {
+		if(!hasWorld()) {
+			currentGameWorld = copyAsTemp(originalGameWorld);
+		}
+	}
+
 	public static void deleteWorld() {
 		if(hasWorld()) {
-			deleteWorld(originalGameWorld);
-			originalGameWorld = null;
+			deleteTempWorld(currentGameWorld);
+			currentGameWorld = null;
 		}
 	}
 
@@ -111,7 +117,8 @@ public class WorldManager {
 		if(!(new File(world.getWorldFolder().getAbsolutePath() + "/temp.info").exists())) {
 			return false;
 		}
-		return deleteWorld(world.getWorldFolder());
+
+		return deleteWorld(world);
 	}
 
 	public static World getLobby() {
@@ -123,7 +130,7 @@ public class WorldManager {
 	}
 
 	public static World getCurrentGameWorld() {
-		return originalGameWorld;
+		return currentGameWorld;
 	}
 
 	public static boolean hasWorld() {

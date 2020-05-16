@@ -1,6 +1,8 @@
 package ru.game;
 
 import org.bukkit.ChatColor;
+import org.bukkit.World;
+import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 import ru.util.EntityUtils;
 
@@ -15,6 +17,9 @@ public class MDPlayer {
 	private Player player;
 	private ChatColor color;
 	private boolean isGhost;
+	private BossBar moveBar;
+	private final int maxMoveHP = 80;
+	private int moveHP = maxMoveHP;
 
 	public MDPlayer(Player player) {
 		this.player = player;
@@ -45,6 +50,10 @@ public class MDPlayer {
 		PlayerHandler.reset(player);
 	}
 
+	public void update() {
+
+	}
+
 	/**
 	 * Turns player to a ghost, i.g. kills him
 	 */
@@ -60,16 +69,13 @@ public class MDPlayer {
 		}
 	}
 
-	/**
-	 * Checks whether the player is on server and playing
-	 * @return Whether the player is valid
-	 */
-	public boolean isValid() {
-		return player != null;
+	public void remove() {
+		PlayerHandler.getMDPlayers().remove(this);
 	}
 
 	public void onLeave() {
-		player = null;
+		player.teleport(WorldManager.getLobby().getSpawnLocation());
+		remove();
 	}
 
 	public void onDeath() {
@@ -83,7 +89,7 @@ public class MDPlayer {
 	 */
 	@Nullable
 	public static MDPlayer fromPlayer(Player player) {
-		for(MDPlayer mdplayer : PlayerHandler.getPlayers()) {
+		for(MDPlayer mdplayer : PlayerHandler.getMDPlayers()) {
 			if(player.getName().equals(mdplayer.nickname)) return mdplayer;
 		}
 		return null;
