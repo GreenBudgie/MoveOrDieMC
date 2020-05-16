@@ -15,6 +15,33 @@ public enum GameState {
 	}
 
 	private static GameState currentState = STOPPED;
+	private static int timer = -1;
+
+	public static int getTimer() {
+		return timer;
+	}
+
+	public static void setTimer(int timer) {
+		if(timer >= 0) {
+			GameState.timer = timer;
+		}
+	}
+
+	public static void disableTimer() {
+		timer = -1;
+	}
+
+	/**
+	 * Decreases the timer
+	 * @return Whether the time has run out
+	 */
+	public static boolean updateTimer() {
+		if(timer >= 0) {
+			if(timer == 0) return true;
+			timer--;
+		}
+		return false;
+	}
 
 	public static GameState getState() {
 		return currentState;

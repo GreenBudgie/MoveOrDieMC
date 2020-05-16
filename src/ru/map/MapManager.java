@@ -7,6 +7,7 @@ import ru.game.WorldManager;
 import ru.modes.Mode;
 import ru.modes.ModeManager;
 import ru.start.Plugin;
+import ru.util.MathUtils;
 import ru.util.WorldUtils;
 
 import java.io.File;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class MapManager {
 
@@ -40,6 +42,14 @@ public class MapManager {
 				maps.add(map);
 			}
 		}
+	}
+
+	public static List<GameMap> getMaps() {
+		return maps;
+	}
+
+	public static GameMap getRandomMapForMode(Mode mode) {
+		return MathUtils.choose(maps.stream().filter(map -> map.getSupportedModes().contains(mode)).collect(Collectors.toList()));
 	}
 
 }

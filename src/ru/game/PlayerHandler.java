@@ -7,6 +7,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import ru.util.Broadcaster;
 import ru.util.EntityUtils;
 
@@ -36,13 +38,24 @@ public class PlayerHandler implements Listener {
 	}
 
 	public static void reset(Player player) {
-		player.getInventory().clear();
 		player.getActivePotionEffects().forEach(ef -> player.removePotionEffect(ef.getType()));
+		resetNoEffects(player);
+	}
+
+	public static void resetNoEffects(Player player) {
+		player.getInventory().clear();
 		EntityUtils.heal(player);
 		player.setFireTicks(0);
 		player.setNoDamageTicks(0);
 		player.setExp(0);
 		player.setLevel(0);
+	}
+
+	public static void giveDefaultEffects(Player player) {
+		player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0, false, false));
+		player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 1, false, false));
+		player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 3, false, false));
+		player.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, Integer.MAX_VALUE, 0, false, false));
 	}
 
 	@EventHandler
@@ -54,6 +67,7 @@ public class PlayerHandler implements Listener {
 		if(player.getWorld() != WorldManager.getLobby()) {
 			player.teleport(WorldManager.getLobby().getSpawnLocation());
 		}
+		ScoreboardHandler.updateScoreboardTeamsLater();
 	}
 
 	@EventHandler
@@ -67,6 +81,7 @@ public class PlayerHandler implements Listener {
 		if(isInLobby(player)) {
 			Broadcaster.inWorld(WorldManager.getLobby()).toChat(ChatColor.GOLD + player.getName() + ChatColor.YELLOW + " отключился");
 		}
+		ScoreboardHandler.updateScoreboardTeamsLater();
 	}
 
 }

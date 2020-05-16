@@ -9,6 +9,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import ru.game.MoveOrDie;
+import ru.game.PlayerHandler;
 import ru.game.WorldManager;
 import ru.lobby.LobbyParkour;
 import ru.lobby.LobbyParkourHandler;
@@ -42,7 +43,7 @@ public class CommandMoveOrDie implements CommandExecutor, TabCompleter {
 			}
 		}
 		if(args[0].equalsIgnoreCase("effects")) {
-			MoveOrDie.giveDefaultEffects(player);
+			PlayerHandler.giveDefaultEffects(player);
 		}
 		return true;
 	}

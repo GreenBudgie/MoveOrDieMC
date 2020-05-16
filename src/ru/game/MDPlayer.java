@@ -51,7 +51,7 @@ public class MDPlayer {
 	}
 
 	public void update() {
-
+		ScoreboardHandler.updateGameScoreboard(player);
 	}
 
 	/**
