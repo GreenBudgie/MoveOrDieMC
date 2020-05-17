@@ -48,7 +48,7 @@ public class MoveOrDie implements Listener {
 
 	public static void startGame() {
 		if(!GameState.isPlaying()) {
-			Broadcaster.everybody().title(ChatColor.RED + "" + ChatColor.BOLD + "Игра" + ChatColor.BLUE + " Начинается", "", 10, 60, 20);
+			Broadcaster.everybody().title(ChatColor.RED + "" + ChatColor.BOLD + "Игра" + ChatColor.BLUE + " Начинается", "", 10, 40, 10);
 			WorldManager.makeWorld();
 
 			List<Player> shuffled = Lists.newArrayList(Bukkit.getOnlinePlayers());
@@ -72,7 +72,7 @@ public class MoveOrDie implements Listener {
 				EntityUtils.teleportCentered(player, MapSetup.getSpawn(color), true, true);
 			}
 			GameState.SETUP.set();
-			GameState.setTimer(20);
+			GameState.setTimer(15);
 			ModeManager.setup();
 			LobbySignManager.updateSigns();
 		}

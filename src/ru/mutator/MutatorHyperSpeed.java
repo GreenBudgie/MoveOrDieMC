@@ -12,7 +12,7 @@ public class MutatorHyperSpeed extends Mutator {
 
 	@Override
 	public String getName() {
-		return ChatColor.AQUA + "Гиперскорость";
+		return "Гиперскорость";
 	}
 
 	@Override

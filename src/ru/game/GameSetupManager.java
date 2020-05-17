@@ -12,12 +12,12 @@ public class GameSetupManager {
 			if(GameState.updateTimer()) {
 				MutatorSelector.start();
 			} else {
-				if(GameState.getTimer() == 15) {
+				if(GameState.getTimer() == 11) {
 					for(Player player : PlayerHandler.getPlayers()) {
 						player.sendTitle("", ChatColor.GREEN + "Добро пожаловать в", 20, 100, 20);
 					}
 				}
-				if(GameState.getTimer() == 13) {
+				if(GameState.getTimer() == 9) {
 					for(Player player : PlayerHandler.getPlayers()) {
 						player.sendTitle(MoveOrDie.getLogo(), null, 0, 60, 20);
 					}
@@ -35,7 +35,8 @@ public class GameSetupManager {
 				}*/
 				if(GameState.getTimer() < 3) {
 					for(Player player : PlayerHandler.getPlayers()) {
-						player.sendTitle(ChatColor.DARK_GREEN + String.valueOf(GameState.getTimer() + 1), "", 0, 30, 0);
+						ChatColor color = GameState.getTimer() == 2 ? ChatColor.RED : (GameState.getTimer() == 1 ? ChatColor.YELLOW : ChatColor.BLUE);
+						player.sendTitle(color + "" + ChatColor.BOLD + (GameState.getTimer() + 1), "", 0, 30, 10);
 					}
 				}
 			}

@@ -12,7 +12,7 @@ public class MutatorBombDrop extends Mutator {
 
 	@Override
 	public String getName() {
-		return ChatColor.DARK_RED + "Бомбардировка";
+		return "Бомбардировка";
 	}
 
 	@Override

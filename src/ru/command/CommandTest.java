@@ -14,5 +14,5 @@ public class CommandTest implements CommandExecutor {
 		MapManager.getMaps().get(0).reset();
 		return true;
 	}
-	
+
 }

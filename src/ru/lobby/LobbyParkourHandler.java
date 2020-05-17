@@ -85,7 +85,6 @@ public class LobbyParkourHandler implements Listener {
 		passingTicks.put(p, 0);
 		EntityUtils.sendActionBarInfo(p,
 				ChatColor.DARK_GRAY + "[" + parkour.getFullName() + ChatColor.DARK_GRAY + "]" + ChatColor.BOLD + ChatColor.LIGHT_PURPLE + " Начато прохождение");
-		p.playSound(p.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.5F, 0.5F);
 	}
 
 	private static String getNormalTime(Player player) {
@@ -161,6 +160,7 @@ public class LobbyParkourHandler implements Listener {
 			}
 			if(isPassing(player) && e.getTo().getY() <= 0) {
 				EntityUtils.teleport(player, passingParkours.get(player).getCheckpointLocation(), false, true);
+				stopPassing(player);
 				passingTicks.replace(player, 0);
 				toUpdate.remove(player);
 			}

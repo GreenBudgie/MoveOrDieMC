@@ -64,21 +64,23 @@ public class MutatorSelector implements Listener {
 					if(selectedMutator != null) mutators.remove(selectedMutator);
 					Broadcaster br = Broadcaster.each(PlayerHandler.getPlayers());
 					br.title(selectorPlayer.getColor() + selectorPlayer.getNickname(), null, 0, 60, 10);
-					br.toChat(ChatColor.GRAY + StringUtils.repeat("-", 20), "");
 					for(int i = 0; i < 3; i++) {
 						Mutator current = MathUtils.choose(mutators);
 						mutatorsToSelect.add(current);
 						mutators.remove(current);
-						br.toChat(ChatColor.YELLOW + String.valueOf(i + 1) + ChatColor.GRAY + ". " + current.getName());
-						selectorPlayer.getPlayer().getInventory().setItem(2 + i * 2, ItemUtils.builder(current.getItemToShow()).withName(current.getName()).build());
+						selectorPlayer.getPlayer().getInventory().setItem(2 + i * 2, ItemUtils.builder(current.getItemToShow()).withName(current.getColoredName()).build());
 					}
-					br.toChat("", ChatColor.GRAY + StringUtils.repeat("-", 20));
+					String line = ChatColor.GRAY + " | ";
+					br.toActionBar(mutatorsToSelect.get(0).getColoredName() + line + mutatorsToSelect.get(1).getColoredName() + line + mutatorsToSelect.get(2).getColoredName());
 					selecting = true;
 				}
 				if(GameState.getTimer() <= 10 && GameState.getTimer() > 3) {
-					EntityUtils.sendActionBarInfo(selectorPlayer.getPlayer(), ChatColor.DARK_RED + "" + ChatColor.BOLD + (GameState.getTimer() - 3));
+					selectorPlayer.getPlayer().sendTitle( "", ChatColor.DARK_RED + "" + ChatColor.BOLD + (GameState.getTimer() - 3), 0, 30, 10);
+					Broadcaster br = Broadcaster.each(PlayerHandler.getPlayers());
+					String line = ChatColor.GRAY + " | ";
+					br.toActionBar(mutatorsToSelect.get(0).getColoredName() + line + mutatorsToSelect.get(1).getColoredName() + line + mutatorsToSelect.get(2).getColoredName());
 				}
-				if(GameState.getTimer() == 3 && !selecting) {
+				if(GameState.getTimer() == 3 && selecting) {
 					onSelect();
 				}
 			}
@@ -90,10 +92,10 @@ public class MutatorSelector implements Listener {
 			selectedMutator = MathUtils.choose(mutatorsToSelect);
 		}
 		Broadcaster br = Broadcaster.each(PlayerHandler.getPlayers());
-		br.title(selectedMutator.getName(), ChatColor.GREEN + "Новый мутатор", 5, 60, 10);
-		br.toChat(ChatColor.GRAY + "----- " + selectedMutator.getName() + ChatColor.GRAY + " -----", "");
+		br.title(selectedMutator.getColoredName(), ChatColor.GREEN + "Новый мутатор", 5, 40, 20);
+		br.toChat("", ChatColor.GRAY + "----- " + selectedMutator.getColoredName() + ChatColor.GRAY + " -----", "");
 		br.toChat(ChatColor.GREEN + selectedMutator.getDescription());
-		br.toChat("", ChatColor.GRAY + StringUtils.repeat("-", 12 + ChatColor.stripColor(selectedMutator.getName()).length()));
+		br.toChat("", ChatColor.GRAY + StringUtils.repeat("-", 12 + ChatColor.stripColor(selectedMutator.getColoredName()).length()));
 		selectorPlayer.getPlayer().getInventory().clear();
 		mutatorsToSelect.clear();
 		selecting = false;

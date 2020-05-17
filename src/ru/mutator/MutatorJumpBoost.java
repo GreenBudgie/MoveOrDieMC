@@ -12,7 +12,7 @@ public class MutatorJumpBoost extends Mutator {
 
 	@Override
 	public String getName() {
-		return ChatColor.DARK_GREEN + "К Небесам!";
+		return "К Небесам!";
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package ru.mutator;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 
 public abstract class Mutator {
@@ -31,6 +32,10 @@ public abstract class Mutator {
 	}
 
 	public void update() {
+	}
+
+	public final String getColoredName() {
+		return ChatColor.DARK_RED + "" + ChatColor.BOLD + getName() + ChatColor.RESET;
 	}
 
 }
