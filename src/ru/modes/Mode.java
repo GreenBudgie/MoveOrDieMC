@@ -23,7 +23,7 @@ public abstract class Mode {
 	}
 
 	public final void start() {
-		GameMap map = MapManager.getRandomMapForMode(this);
+		GameMap map = MapManager.useMapForMode(this);
 		map.spreadPlayers();
 		for(Player player : PlayerHandler.getPlayers()) {
 			PlayerHandler.resetNoEffects(player);

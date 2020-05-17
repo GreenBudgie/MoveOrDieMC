@@ -43,6 +43,14 @@ public class Region implements ConfigurationSerializable {
 	}
 
 	/**
+	 * Creates a copy of a region
+	 * @param toClone A region to make a copy from
+	 */
+	public Region(Region toClone) {
+		this(toClone.start.clone(), toClone.end.clone());
+	}
+
+	/**
 	 * Deserealizes a region from the given config. If config is invalid it returns null
 	 * @param args Config
 	 * @return Deserealized region, or null
@@ -56,14 +64,14 @@ public class Region implements ConfigurationSerializable {
 				String str = String.valueOf(args.get("start"));
 				String[] pos = str.split(" ");
 				if(pos.length == 3) {
-					start = new Location(null, Integer.valueOf(pos[0]), Integer.valueOf(pos[1]), Integer.valueOf(pos[2]));
+					start = new Location(null, Integer.parseInt(pos[0]), Integer.parseInt(pos[1]), Integer.parseInt(pos[2]));
 				} else return null;
 			} else return null;
 			if(args.containsKey("end")) {
 				String str = String.valueOf(args.get("end"));
 				String[] pos = str.split(" ");
 				if(pos.length == 3) {
-					end = new Location(null, Integer.valueOf(pos[0]), Integer.valueOf(pos[1]), Integer.valueOf(pos[2]));
+					end = new Location(null, Integer.parseInt(pos[0]), Integer.parseInt(pos[1]), Integer.parseInt(pos[2]));
 				} else return null;
 			} else return null;
 			Region region = new Region(start, end);
@@ -270,8 +278,8 @@ public class Region implements ConfigurationSerializable {
 	@Override
 	public Map<String, Object> serialize() {
 		Map<String, Object> result = new LinkedHashMap<>();
-		result.put("start", String.valueOf(x1) + String.valueOf(y1) + String.valueOf(z1));
-		result.put("end", String.valueOf(x1) + " " + String.valueOf(y1) + " " + String.valueOf(z1));
+		result.put("start", x1 + " " + y1 + " " + z1);
+		result.put("end", x2 + " " + y2 + " " + z2);
 		if(hasWorld()) result.put("world", start.getWorld().getName());
 		return result;
 	}

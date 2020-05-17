@@ -36,7 +36,7 @@ public class LobbyParkourHandler implements Listener {
 		LobbyParkour medium = new LobbyParkour();
 		medium.setName(ChatColor.DARK_GREEN + "Средний");
 		medium.setStartLocation(new Location(lobby, -11, 11, -2));
-		medium.setFinishLocation(new Location(lobby, -21, 25, -19));
+		medium.setFinishLocation(new Location(lobby, -17, 22, -16));
 		medium.setCheckpointLocation(new Location(lobby, -6.5, 10, 2.5, 135, 0));
 		medium.setSignLocation(new Location(lobby, -9, 10, 1));
 

@@ -69,7 +69,7 @@ public class MutatorSelector implements Listener {
 						Mutator current = MathUtils.choose(mutators);
 						mutatorsToSelect.add(current);
 						mutators.remove(current);
-						br.toChat(ChatColor.YELLOW + String.valueOf(i) + ChatColor.GRAY + ". " + current.getName());
+						br.toChat(ChatColor.YELLOW + String.valueOf(i + 1) + ChatColor.GRAY + ". " + current.getName());
 						selectorPlayer.getPlayer().getInventory().setItem(2 + i * 2, ItemUtils.builder(current.getItemToShow()).withName(current.getName()).build());
 					}
 					br.toChat("", ChatColor.GRAY + StringUtils.repeat("-", 20));

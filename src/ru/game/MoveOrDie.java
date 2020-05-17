@@ -121,7 +121,7 @@ public class MoveOrDie implements Listener {
 
 	public static String getLogo() {
 		return ChatColor.RED + "" + ChatColor.BOLD + "Move" + ChatColor.RESET + ChatColor.YELLOW + " or " + ChatColor.RESET + ChatColor.BLUE
-				+ ChatColor.BOLD + "Die " + ChatColor.RESET + ChatColor.DARK_GREEN + "MC";
+				+ ChatColor.BOLD + "Die";
 	}
 
 }
