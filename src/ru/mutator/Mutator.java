@@ -5,7 +5,7 @@ import org.bukkit.Material;
 public abstract class Mutator {
 
 	public Mutator() {
-		MutatorManager.mutators.add(this);
+		MutatorManager.getMutators().add(this);
 	}
 
 	public abstract Material getItemToShow();
@@ -25,10 +25,6 @@ public abstract class Mutator {
 
 	public final void deactivate() {
 		onDeactivate();
-	}
-
-	public final String getInfo() {
-		return ""; //TODO
 	}
 
 	public void onActivate() {

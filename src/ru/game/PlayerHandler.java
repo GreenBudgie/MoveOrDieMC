@@ -3,8 +3,11 @@ package ru.game;
 import com.google.common.collect.Sets;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.potion.PotionEffect;
@@ -82,6 +85,20 @@ public class PlayerHandler implements Listener {
 			Broadcaster.inWorld(WorldManager.getLobby()).toChat(ChatColor.GOLD + player.getName() + ChatColor.YELLOW + " отключился");
 		}
 		ScoreboardHandler.updateScoreboardTeamsLater();
+	}
+
+	@EventHandler
+	public void noDrop(PlayerDropItemEvent e) {
+		if(isPlaying(e.getPlayer())) {
+			e.setCancelled(true);
+		}
+	}
+
+	@EventHandler
+	public void noInventoryInteract(InventoryClickEvent e) {
+		if(isPlaying((Player) e.getWhoClicked())) {
+			e.setCancelled(true);
+		}
 	}
 
 }

@@ -1,6 +1,7 @@
 package ru.modes;
 
 import com.google.common.collect.Sets;
+import ru.game.GameState;
 import ru.util.MathUtils;
 
 import java.util.ArrayList;
@@ -47,6 +48,12 @@ public class ModeManager {
 		activeMode = MathUtils.choose(availableModes);
 		availableModes.remove(activeMode);
 		return activeMode;
+	}
+
+	public static void startNewRound() {
+		selectRandomMode().start();
+		GameState.disableTimer();
+		GameState.GAME.set();
 	}
 
 }

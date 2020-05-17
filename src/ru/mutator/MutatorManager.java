@@ -8,12 +8,19 @@ import java.util.List;
 public class MutatorManager implements Listener {
 
 	private static Mutator activeMutator = null;
-	public static List<Mutator> mutators = new ArrayList<>();
+	private static List<Mutator> mutators = new ArrayList<>();
+	public static MutatorJumpBoost JUMP_BOOST = new MutatorJumpBoost();
+	public static MutatorHyperSpeed HYPER_SPEED = new MutatorHyperSpeed();
+	public static MutatorBombDrop BOMB_DROP = new MutatorBombDrop();
 
 	public static void update() {
 		if(activeMutator != null) {
 			activeMutator.update();
 		}
+	}
+
+	public static List<Mutator> getMutators() {
+		return mutators;
 	}
 
 	public static Mutator getActiveMutator() {

@@ -7,7 +7,7 @@ import ru.game.WorldManager;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SetupMap {
+public class MapSetup {
 
 	private static Map<ChatColor, Location> spawns = new HashMap<>();
 

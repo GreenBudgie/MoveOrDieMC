@@ -12,10 +12,11 @@ import ru.lobby.LobbyEntertainmentHandler;
 import ru.lobby.LobbyParkourHandler;
 import ru.lobby.sign.LobbySignManager;
 import ru.map.MapManager;
-import ru.map.SetupMap;
+import ru.map.MapSetup;
 import ru.modes.Mode;
 import ru.modes.ModeManager;
 import ru.mutator.MutatorManager;
+import ru.mutator.MutatorSelector;
 import ru.start.Plugin;
 import ru.util.Broadcaster;
 import ru.util.EntityUtils;
@@ -68,7 +69,7 @@ public class MoveOrDie implements Listener {
 				player.setGameMode(GameMode.ADVENTURE);
 				ScoreboardHandler.createGameScoreboard(player);
 				//Teleporting
-				EntityUtils.teleportCentered(player, SetupMap.getSpawn(color), true, true);
+				EntityUtils.teleportCentered(player, MapSetup.getSpawn(color), true, true);
 			}
 			GameState.SETUP.set();
 			GameState.setTimer(20);
@@ -90,6 +91,7 @@ public class MoveOrDie implements Listener {
 			LobbySignManager.updateSigns();
 			ScoreboardHandler.updateScoreboardTeams();
 			ModeManager.cleanup();
+			MutatorSelector.cleanup();
 		}
 	}
 
@@ -99,44 +101,17 @@ public class MoveOrDie implements Listener {
 			for(MDPlayer mdPlayer : PlayerHandler.getMDPlayers()) {
 				mdPlayer.update();
 			}
-			ModeManager.update();
-			MutatorManager.update();
-			ScoreboardHandler.updateGameTeams();
+			if(TaskManager.ticksPassed(10)) ScoreboardHandler.updateGameTeams();
 		}
 		if(GameState.SETUP.isRunning()) {
-			if(TaskManager.isSecUpdated()) {
-				if(GameState.updateTimer()) {
-					ModeManager.getActiveMode().start();
-					GameState.GAME.set();
-				} else {
-					if(GameState.getTimer() == 15) {
-						for(Player player : PlayerHandler.getPlayers()) {
-							player.sendTitle("", ChatColor.GREEN + "Добро пожаловать в", 20, 100, 20);
-						}
-					}
-					if(GameState.getTimer() == 13) {
-						for(Player player : PlayerHandler.getPlayers()) {
-							player.sendTitle(getLogo(), null, 10, 60, 20);
-						}
-					}
-					if(GameState.getTimer() == 8) {
-						Mode mode = ModeManager.selectRandomMode();
-						for(Player player : PlayerHandler.getPlayers()) {
-							player.sendTitle(mode.getName(), ChatColor.GREEN + "Следующий режим", 10, 60, 20);
-							player.sendMessage(ChatColor.GRAY + "----- " + mode.getName() + ChatColor.RESET + ChatColor.GRAY + " -----");
-							player.sendMessage("");
-							player.sendMessage(ChatColor.GREEN + mode.getDescription());
-							player.sendMessage("");
-							player.sendMessage(ChatColor.GRAY + StringUtils.repeat("-", 12 + ChatColor.stripColor(mode.getName()).length()));
-						}
-					}
-					if(GameState.getTimer() < 3) {
-						for(Player player : PlayerHandler.getPlayers()) {
-							player.sendTitle(ChatColor.DARK_GREEN + String.valueOf(GameState.getTimer() + 1), "", 0, 30, 0);
-						}
-					}
-				}
-			}
+			GameSetupManager.update();
+		}
+		if(GameState.MUTATOR.isRunning()) {
+			MutatorSelector.update();
+		}
+		if(GameState.GAME.isRunning()) {
+			ModeManager.update();
+			MutatorManager.update();
 		}
 	}
 
@@ -145,7 +120,7 @@ public class MoveOrDie implements Listener {
 	}
 
 	public static String getLogo() {
-		return ChatColor.RED + "" + ChatColor.BOLD + "Move" + ChatColor.RESET + ChatColor.YELLOW + ChatColor.ITALIC + "Or" + ChatColor.RESET + ChatColor.BLUE
+		return ChatColor.RED + "" + ChatColor.BOLD + "Move" + ChatColor.RESET + ChatColor.YELLOW + " or " + ChatColor.RESET + ChatColor.BLUE
 				+ ChatColor.BOLD + "Die " + ChatColor.RESET + ChatColor.DARK_GREEN + "MC";
 	}
 
