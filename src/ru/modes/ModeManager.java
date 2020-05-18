@@ -1,7 +1,11 @@
 package ru.modes;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import org.bukkit.entity.Player;
 import ru.game.GameState;
+import ru.game.MDPlayer;
+import ru.game.PlayerHandler;
 import ru.util.MathUtils;
 
 import java.util.ArrayList;
@@ -51,9 +55,19 @@ public class ModeManager {
 	}
 
 	public static void startNewRound() {
+		PlayerHandler.clearDeathQueue();
 		selectRandomMode().start();
 		GameState.disableTimer();
 		GameState.GAME.set();
+	}
+
+	public static void endRound() {
+		boolean draw = PlayerHandler.getAlive().isEmpty();
+		if(draw) {
+
+		}
+		GameState.setTimer(3);
+		GameState.ROUND_END.set();
 	}
 
 }

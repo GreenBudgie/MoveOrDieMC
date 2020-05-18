@@ -1,10 +1,12 @@
 package ru.game;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.World;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
-import ru.util.EntityUtils;
+import ru.util.MathUtils;
 
 import javax.annotation.Nullable;
 
@@ -16,14 +18,19 @@ public class MDPlayer {
 	private String nickname;
 	private Player player;
 	private ChatColor color;
-	private boolean isGhost;
+	private boolean isGhost = false;
 	private BossBar moveBar;
 	private final int maxMoveHP = 80;
 	private int moveHP = maxMoveHP;
+	private int score = 0;
 
 	public MDPlayer(Player player) {
 		this.player = player;
 		this.nickname = player.getName();
+		moveBar = Bukkit.createBossBar(MoveOrDie.getLogo(), BarColor.GREEN, BarStyle.SOLID);
+		moveBar.setProgress(1);
+		moveBar.addPlayer(player);
+		moveBar.setVisible(true);
 	}
 
 	public String getNickname() {
@@ -46,12 +53,40 @@ public class MDPlayer {
 		return isGhost;
 	}
 
-	public void reset() {
-		PlayerHandler.reset(player);
+	public void handleSprintHp() {
+		moveHP = MathUtils.clamp(moveHP + 2, 0, maxMoveHP);
+	}
+
+	public void handleWalkHp() {
+		moveHP = MathUtils.clamp(moveHP + 1, 0, maxMoveHP);
 	}
 
 	public void update() {
 		ScoreboardHandler.updateGameScoreboard(player);
+		if(isGhost) {
+			moveBar.setProgress(0);
+			moveBar.setColor(BarColor.WHITE);
+			moveHP = maxMoveHP;
+		} else {
+			if(GameState.GAME.isRunning()) {
+				if(moveHP > 0) {
+					moveHP -= 1;
+				} else {
+					player.setHealth(0);
+				}
+			} else {
+				moveHP = maxMoveHP;
+			}
+			double value = (double) moveHP / maxMoveHP;
+			if(value > 0.5) {
+				moveBar.setColor(BarColor.GREEN);
+			} else if(value > 0.25) {
+				moveBar.setColor(BarColor.YELLOW);
+			} else {
+				moveBar.setColor(BarColor.RED);
+			}
+			moveBar.setProgress(value);
+		}
 	}
 
 	/**
@@ -59,14 +94,26 @@ public class MDPlayer {
 	 */
 	public void makeGhost() {
 		if(!isGhost) {
-
+			isGhost = true;
+			player.setInvulnerable(true);
+			PlayerHandler.reset(player);
+			PlayerHandler.giveGhostEffects(player);
+			PlayerHandler.setDeathHandle(this);
 		}
 	}
 
 	public void resurrect() {
 		if(isGhost) {
-
+			isGhost = false;
+			player.setInvulnerable(true);
+			PlayerHandler.reset(player);
+			PlayerHandler.givePlayerEffects(player);
 		}
+	}
+
+	public void cleanup() {
+		moveBar.removeAll();
+		moveBar.setVisible(false);
 	}
 
 	public void remove() {
@@ -75,11 +122,14 @@ public class MDPlayer {
 
 	public void onLeave() {
 		player.teleport(WorldManager.getLobby().getSpawnLocation());
+		cleanup();
 		remove();
 	}
 
 	public void onDeath() {
-		isGhost = true;
+		if(GameState.GAME.isRunning()) {
+			makeGhost();
+		}
 	}
 
 	/**

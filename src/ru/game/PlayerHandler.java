@@ -6,16 +6,21 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import ru.modes.ModeManager;
 import ru.util.Broadcaster;
 import ru.util.EntityUtils;
+import ru.util.WorldUtils;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -23,6 +28,12 @@ import java.util.stream.Collectors;
 public class PlayerHandler implements Listener {
 
 	private static List<MDPlayer> players = new ArrayList<>();
+	//Handles player's deaths queue. It uses a list inside so that to handle simultaneous deaths
+	private static List<Set<MDPlayer>> deathQueue = new ArrayList<>();
+	//Draw handling
+	private static final int maxDeathHandleDelay = 2;
+	private static int deathHandleDelay = -1;
+	private static Set<MDPlayer> lastDeaths = new HashSet<>();
 
 	public static List<Player> getPlayers() {
 		return players.stream().map(MDPlayer::getPlayer).collect(Collectors.toList());
@@ -40,9 +51,59 @@ public class PlayerHandler implements Listener {
 		return MDPlayer.fromPlayer(player) != null;
 	}
 
+	public static void update() {
+		for(MDPlayer mdPlayer : getMDPlayers()) {
+			mdPlayer.update();
+		}
+		if(deathHandleDelay != -1) {
+			if(deathHandleDelay == 0) {
+				handleDeathResult();
+				deathHandleDelay = -1;
+			} else {
+				deathHandleDelay--;
+			}
+		}
+	}
+
 	public static void reset(Player player) {
 		player.getActivePotionEffects().forEach(ef -> player.removePotionEffect(ef.getType()));
 		resetNoEffects(player);
+	}
+
+	public static List<MDPlayer> getGhosts() {
+		return players.stream().filter(MDPlayer::isGhost).collect(Collectors.toList());
+	}
+
+	public static List<MDPlayer> getAlive() {
+		return players.stream().filter(player -> !player.isGhost()).collect(Collectors.toList());
+	}
+
+	public static List<Set<MDPlayer>> getDeathQueue() {
+		return deathQueue;
+	}
+
+	public static void clearDeathQueue() {
+		deathQueue.clear();
+	}
+
+	public static void handleDeathResult() {
+		if(GameState.GAME.isRunning()) {
+			deathQueue.add(lastDeaths);
+			if(getAlive().size() <= 1) {
+				ModeManager.endRound();
+			}
+			lastDeaths.clear();
+			deathHandleDelay = -1;
+		}
+	}
+
+	public static void setDeathHandle(MDPlayer mdPlayer) {
+		if(GameState.GAME.isRunning()) {
+			lastDeaths.add(mdPlayer);
+			if(deathHandleDelay == -1) {
+				deathHandleDelay = maxDeathHandleDelay;
+			}
+		}
 	}
 
 	public static void resetNoEffects(Player player) {
@@ -54,11 +115,42 @@ public class PlayerHandler implements Listener {
 		player.setLevel(0);
 	}
 
-	public static void giveDefaultEffects(Player player) {
+	public static void givePlayerEffects(Player player) {
 		player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0, false, false));
 		player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 1, false, false));
 		player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 3, false, false));
 		player.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, Integer.MAX_VALUE, 0, false, false));
+	}
+
+	public static void giveGhostEffects(Player player) {
+		player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 0, false, false));
+		player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 0, false, false));
+		player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 2, false, false));
+		player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 0, false, false));
+	}
+
+	@EventHandler
+	public void death(PlayerDeathEvent e) {
+		Player player = e.getEntity();
+		if(isPlaying(player)) {
+			MDPlayer mdPlayer = MDPlayer.fromPlayer(player);
+			if(mdPlayer != null) mdPlayer.onDeath();
+		}
+	}
+
+	@EventHandler
+	public void move(PlayerMoveEvent e) {
+		Player player = e.getPlayer();
+		if(isPlaying(player)) {
+			MDPlayer mdPlayer = MDPlayer.fromPlayer(player);
+			if(mdPlayer != null && e.getTo() != null && player.isOnGround() && !WorldUtils.compareLocations(e.getFrom(), e.getTo())) {
+				if(player.isSprinting()) {
+					mdPlayer.handleSprintHp();
+				} else {
+					if(!player.isSneaking()) mdPlayer.handleWalkHp();
+				}
+			}
+		}
 	}
 
 	@EventHandler

@@ -40,7 +40,12 @@ public class ScoreboardHandler {
 					continue;
 				}
 				if(PlayerHandler.isPlaying(currentPlayer)) {
-					gameScoreboard.getTeam(mdPlayer.getColor().name() + "Team").addEntry(currentPlayer.getName());
+					MDPlayer currentMDPlayer = MDPlayer.fromPlayer(currentPlayer);
+					if(currentMDPlayer.isGhost()) {
+						gameScoreboard.getTeam(mdPlayer.getColor().name() + "Team").addEntry(currentPlayer.getName());
+					} else {
+						gameScoreboard.getTeam(currentMDPlayer.getColor().name() + "Team").addEntry(currentPlayer.getName());
+					}
 				}
 			}
 		}

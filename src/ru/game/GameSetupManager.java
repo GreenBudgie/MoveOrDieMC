@@ -2,15 +2,42 @@ package ru.game;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import ru.map.MapSetup;
+import ru.modes.ModeManager;
 import ru.mutator.MutatorSelector;
+import ru.util.EntityUtils;
 import ru.util.TaskManager;
 
 public class GameSetupManager {
 
+	public static int FAST_START = 0; //0 - default start, 1 - start from mutator selection, 2 - start from game mode itself
+
+	public static void start() {
+		ModeManager.setup();
+		if(FAST_START == 0) {
+			for(MDPlayer mdPlayer : PlayerHandler.getMDPlayers()) {
+				EntityUtils.teleportCentered(mdPlayer.getPlayer(), MapSetup.getSpawn(mdPlayer.getColor()), true, true);
+			}
+			GameState.SETUP.set();
+			GameState.setTimer(15);
+		}
+		if(FAST_START == 1) {
+			MutatorSelector.start();
+		}
+		if(FAST_START == 2) {
+			ModeManager.startNewRound();
+		}
+		FAST_START = 0;
+	}
+
+	public static void finish() {
+		MutatorSelector.start();
+	}
+
 	public static void update() {
 		if(TaskManager.isSecUpdated()) {
 			if(GameState.updateTimer()) {
-				MutatorSelector.start();
+				finish();
 			} else {
 				if(GameState.getTimer() == 11) {
 					for(Player player : PlayerHandler.getPlayers()) {

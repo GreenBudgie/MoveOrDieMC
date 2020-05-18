@@ -2,7 +2,6 @@ package ru.game;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -12,14 +11,11 @@ import ru.lobby.LobbyEntertainmentHandler;
 import ru.lobby.LobbyParkourHandler;
 import ru.lobby.sign.LobbySignManager;
 import ru.map.MapManager;
-import ru.map.MapSetup;
-import ru.modes.Mode;
 import ru.modes.ModeManager;
 import ru.mutator.MutatorManager;
 import ru.mutator.MutatorSelector;
 import ru.start.Plugin;
 import ru.util.Broadcaster;
-import ru.util.EntityUtils;
 import ru.util.MathUtils;
 import ru.util.TaskManager;
 
@@ -65,25 +61,24 @@ public class MoveOrDie implements Listener {
 				colors.remove(color);
 				//Setting up for teleport
 				PlayerHandler.reset(player);
-				PlayerHandler.giveDefaultEffects(player);
+				PlayerHandler.givePlayerEffects(player);
 				player.setGameMode(GameMode.ADVENTURE);
 				ScoreboardHandler.createGameScoreboard(player);
-				//Teleporting
-				EntityUtils.teleportCentered(player, MapSetup.getSpawn(color), true, true);
 			}
-			GameState.SETUP.set();
-			GameState.setTimer(15);
-			ModeManager.setup();
+			GameSetupManager.start();
 			LobbySignManager.updateSigns();
 		}
 	}
 
 	public static void endGame() {
 		if(GameState.isPlaying()) {
-			for(Player player : PlayerHandler.getPlayers()) {
+			for(MDPlayer mdPlayer : PlayerHandler.getMDPlayers()) {
+				Player player = mdPlayer.getPlayer();
 				player.setGameMode(GameMode.SURVIVAL);
 				PlayerHandler.reset(player);
 				player.teleport(WorldManager.getLobby().getSpawnLocation());
+				player.setInvulnerable(false);
+				mdPlayer.cleanup();
 			}
 			WorldManager.deleteWorld();
 			PlayerHandler.getMDPlayers().clear();
@@ -98,9 +93,7 @@ public class MoveOrDie implements Listener {
 	public static void update() {
 		LobbyParkourHandler.update();
 		if(GameState.isPlaying()) {
-			for(MDPlayer mdPlayer : PlayerHandler.getMDPlayers()) {
-				mdPlayer.update();
-			}
+			PlayerHandler.update();
 			if(TaskManager.ticksPassed(10)) ScoreboardHandler.updateGameTeams();
 		}
 		if(GameState.SETUP.isRunning()) {

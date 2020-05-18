@@ -5,7 +5,6 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import ru.map.MapFinale;
-import ru.map.MapMutator;
 import ru.util.EntityUtils;
 
 import java.util.Collections;

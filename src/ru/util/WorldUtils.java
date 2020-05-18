@@ -2,6 +2,7 @@ package ru.util;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.NumberConversions;
 
@@ -19,6 +20,28 @@ public class WorldUtils {
 	 */
 	public static boolean compareIntegerLocations(Location l1, Location l2) {
 		return l1.getBlockX() == l2.getBlockX() && l1.getBlockY() == l2.getBlockY() && l1.getBlockZ() == l2.getBlockZ();
+	}
+
+	/**
+	 * Compares two locations by their coordinates. This method does not check worlds, pitch and yaw!
+	 * @param l1 First location to compare
+	 * @param l2 Second location to compare
+	 * @return Whether two locations are equal to each other by their coordinates
+	 */
+	public static boolean compareLocations(Location l1, Location l2) {
+		if (l1 == null || l2 == null) {
+			return false;
+		}
+		if (Double.doubleToLongBits(l1.getX()) != Double.doubleToLongBits(l2.getX())) {
+			return false;
+		}
+		if (Double.doubleToLongBits(l1.getY()) != Double.doubleToLongBits(l2.getY())) {
+			return false;
+		}
+		if (Double.doubleToLongBits(l1.getZ()) != Double.doubleToLongBits(l2.getZ())) {
+			return false;
+		}
+		return true;
 	}
 
 	public static <T extends Entity> List<T> getEntitiesInRange(Location pivot, double range, Class<T> entityClass) {

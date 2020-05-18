@@ -8,6 +8,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import ru.game.GameSetupManager;
 import ru.game.MoveOrDie;
 import ru.game.PlayerHandler;
 import ru.game.WorldManager;
@@ -22,28 +23,34 @@ public class CommandMoveOrDie implements CommandExecutor, TabCompleter {
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if(!sender.isOp()) return true;
 		Player player = (Player) sender;
-		if(args[0].equalsIgnoreCase("start")) {
-			MoveOrDie.startGame();
-		}
-		if(args[0].equalsIgnoreCase("end")) {
-			MoveOrDie.endGame();
-		}
-		if(args[0].equalsIgnoreCase("mainworld")) {
-			player.setGameMode(GameMode.CREATIVE);
-			player.setFlying(true);
-			player.teleport(WorldManager.getOriginalGameWorld().getSpawnLocation());
-		}
-		if(args[0].equalsIgnoreCase("parkour_reset")) {
-			for(LobbyParkour parkour : LobbyParkourHandler.parkours) {
-				Sign sign = parkour.getSign();
-				sign.setLine(1, "");
-				sign.setLine(2, "");
-				sign.setLine(3, "");
-				sign.update();
+		if(args.length > 0) {
+			if(args[0].equalsIgnoreCase("start")) {
+				if(args.length > 1) {
+					if(args[1].equalsIgnoreCase("mutator")) GameSetupManager.FAST_START = 1;
+					if(args[1].equalsIgnoreCase("game")) GameSetupManager.FAST_START = 2;
+				}
+				MoveOrDie.startGame();
 			}
-		}
-		if(args[0].equalsIgnoreCase("effects")) {
-			PlayerHandler.giveDefaultEffects(player);
+			if(args[0].equalsIgnoreCase("end")) {
+				MoveOrDie.endGame();
+			}
+			if(args[0].equalsIgnoreCase("mainworld")) {
+				player.setGameMode(GameMode.CREATIVE);
+				player.setFlying(true);
+				player.teleport(WorldManager.getOriginalGameWorld().getSpawnLocation());
+			}
+			if(args[0].equalsIgnoreCase("parkour_reset")) {
+				for(LobbyParkour parkour : LobbyParkourHandler.parkours) {
+					Sign sign = parkour.getSign();
+					sign.setLine(1, "");
+					sign.setLine(2, "");
+					sign.setLine(3, "");
+					sign.update();
+				}
+			}
+			if(args[0].equalsIgnoreCase("effects")) {
+				PlayerHandler.givePlayerEffects(player);
+			}
 		}
 		return true;
 	}
@@ -52,6 +59,9 @@ public class CommandMoveOrDie implements CommandExecutor, TabCompleter {
 	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
 		if(args.length == 1) {
 			return getMatchingStrings(args, "start", "end", "mainworld", "parkour_reset", "effects");
+		}
+		if(args.length == 2 && args[0].equalsIgnoreCase("start")) {
+			return getMatchingStrings(args, "mutator", "game");
 		}
 		return null;
 	}
