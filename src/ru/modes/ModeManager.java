@@ -2,12 +2,11 @@ package ru.modes;
 
 import com.google.common.collect.Sets;
 import org.bukkit.ChatColor;
-import ru.game.GameState;
-import ru.game.MDPlayer;
-import ru.game.MoveOrDie;
-import ru.game.PlayerHandler;
+import org.bukkit.entity.Player;
+import ru.game.*;
 import ru.util.Broadcaster;
 import ru.util.MathUtils;
+import ru.util.TaskManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +35,9 @@ public class ModeManager {
 		if(activeMode != null && activeMode.isActive()) {
 			activeMode.update();
 		}
+		if(TaskManager.isSecUpdated() && GameState.updateTimer()) {
+			endRound();
+		}
 	}
 
 	public static void setup() {
@@ -56,19 +58,40 @@ public class ModeManager {
 	}
 
 	public static void startNewRound() {
+		PlayerHandler.resurrectAll();
 		PlayerHandler.clearDeathQueue();
-		selectRandomMode().start();
-		GameState.disableTimer();
+		selectRandomMode().prepare();
+		GameState.setTimer(6);
+		GameState.ROUND_START.set();
+	}
+
+	public static void beginRound() {
+		for(Player player : PlayerHandler.getPlayers()) {
+			player.sendTitle(ChatColor.DARK_RED + "" + ChatColor.BOLD + "GO", "", 0, 20, 5);
+		}
+		activeMode.start();
+		if(activeMode.hasTime()) {
+			GameState.setTimer(activeMode.getTime());
+		} else {
+			GameState.disableTimer();
+		}
 		GameState.GAME.set();
 	}
 
 	private static void addScore(Set<MDPlayer> players, int score) {
-		players.forEach(player -> player.addScore(score));
+		for(MDPlayer player : players) {
+			player.addScore(score);
+			ScoreboardHandler.setAddedScore(player, score);
+		}
 	}
 
 	public static void endRound() {
-		boolean draw = PlayerHandler.getAlive().isEmpty();
+		//FIXME Выдает не те очки, иногда выдает 0))))
+		boolean hasAlive = !PlayerHandler.getAlive().isEmpty();
 		List<Set<MDPlayer>> deathQueue = PlayerHandler.getDeathQueue();
+		if(hasAlive) { //If some players are still alive, we need to add them to death queue so as to give them enough points
+			deathQueue.add(Sets.newHashSet(PlayerHandler.getAlive()));
+		}
 		//Winners
 		addScore(deathQueue.get(deathQueue.size() - 1), MoveOrDie.getWinnerScore());
 		//Second place
@@ -82,13 +105,14 @@ public class ModeManager {
 			}
 		}
 		Broadcaster br = Broadcaster.each(PlayerHandler.getPlayers());
-		if(draw) {
+		if(!hasAlive) {
 			br.title(ChatColor.RED + "" + ChatColor.BOLD + "Ничья", ChatColor.GRAY + "Никто не победил", 5, 60, 10);
 		} else {
 			MDPlayer winner = deathQueue.get(deathQueue.size() - 1).iterator().next();
 			br.title(winner.getColor() + winner.getNickname(), ChatColor.GREEN + "Победил", 5, 60, 10);
 		}
-		GameState.setTimer(3);
+		MoveOrDie.increaseRounds();
+		GameState.setTimer(5);
 		GameState.ROUND_END.set();
 	}
 

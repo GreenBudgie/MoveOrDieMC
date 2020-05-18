@@ -85,7 +85,7 @@ public class MDPlayer {
 		} else {
 			if(GameState.GAME.isRunning()) {
 				if(moveHP > 0) {
-					moveHP -= 1;
+					//moveHP -= 1;
 				} else {
 					player.setHealth(0);
 				}
@@ -114,6 +114,7 @@ public class MDPlayer {
 			PlayerHandler.reset(player);
 			PlayerHandler.giveGhostEffects(player);
 			PlayerHandler.setDeathHandle(this);
+			ScoreboardHandler.updateGameTeams();
 		}
 	}
 
@@ -123,6 +124,7 @@ public class MDPlayer {
 			player.setInvulnerable(true);
 			PlayerHandler.reset(player);
 			PlayerHandler.givePlayerEffects(player);
+			ScoreboardHandler.updateGameTeams();
 		}
 	}
 

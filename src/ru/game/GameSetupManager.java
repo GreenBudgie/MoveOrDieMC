@@ -49,21 +49,10 @@ public class GameSetupManager {
 						player.sendTitle(MoveOrDie.getLogo(), null, 0, 60, 20);
 					}
 				}
-				/*if(GameState.getTimer() == 8) {
-					Mode mode = ModeManager.selectRandomMode();
-					for(Player player : PlayerHandler.getPlayers()) {
-						player.sendTitle(mode.getName(), ChatColor.GREEN + "Следующий режим", 10, 60, 20);
-						player.sendMessage(ChatColor.GRAY + "----- " + mode.getName() + ChatColor.RESET + ChatColor.GRAY + " -----");
-						player.sendMessage("");
-						player.sendMessage(ChatColor.GREEN + mode.getDescription());
-						player.sendMessage("");
-						player.sendMessage(ChatColor.GRAY + StringUtils.repeat("-", 12 + ChatColor.stripColor(mode.getName()).length()));
-					}
-				}*/
 				if(GameState.getTimer() < 3) {
 					for(Player player : PlayerHandler.getPlayers()) {
 						ChatColor color = GameState.getTimer() == 2 ? ChatColor.RED : (GameState.getTimer() == 1 ? ChatColor.YELLOW : ChatColor.BLUE);
-						player.sendTitle(color + "" + ChatColor.BOLD + (GameState.getTimer() + 1), "", 0, 30, 10);
+						player.sendTitle(color + "" + ChatColor.BOLD + (GameState.getTimer() + 1), "", 0, 20, 1);
 					}
 				}
 			}

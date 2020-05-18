@@ -5,14 +5,16 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.*;
+import ru.modes.ModeManager;
+import ru.mutator.MutatorManager;
 import ru.util.TaskManager;
 
 import java.util.*;
 
 public class ScoreboardHandler {
 
-	public static Scoreboard lobbyScoreboard;
-	public static Map<MDPlayer, Integer> addedScore = new HashMap<>();
+	private static Scoreboard lobbyScoreboard;
+	private static Map<MDPlayer, Integer> addedScore = new HashMap<>();
 
 	public static void createGameScoreboard(Player player) {
 		Scoreboard gameScoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
@@ -23,9 +25,14 @@ public class ScoreboardHandler {
 			Team team = gameScoreboard.registerNewTeam(color.name() + "Team");
 			team.setColor(color);
 			team.setCanSeeFriendlyInvisibles(true);
+			team.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.FOR_OWN_TEAM);
 			team.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
 		}
 		player.setScoreboard(gameScoreboard);
+	}
+
+	public static void updateGameTeamsLater() {
+		TaskManager.invokeLater(ScoreboardHandler::updateGameTeams);
 	}
 
 	public static void updateGameTeams() {
@@ -50,6 +57,14 @@ public class ScoreboardHandler {
 		}
 	}
 
+	public static void setAddedScore(MDPlayer player, int score) {
+		addedScore.put(player, score);
+	}
+
+	public static void cleanup() {
+		addedScore.clear();
+	}
+
 	public static void updateGameScoreboard(Player player) {
 		MDPlayer mdPlayer = MDPlayer.fromPlayer(player);
 		Scoreboard board = player.getScoreboard();
@@ -62,9 +77,27 @@ public class ScoreboardHandler {
 		sortedPlayers.sort(Comparator.comparingInt(MDPlayer::getScore));
 		for(MDPlayer currentPlayer : sortedPlayers) {
 			String bold = currentPlayer == mdPlayer ? ChatColor.BOLD + "" : "";
-			Score score = gameInfo.getScore(currentPlayer.getColor() + bold + currentPlayer.getNickname() + " " + ChatColor.GOLD + ChatColor.BOLD + currentPlayer.getScore());
+			String scoreInfo = GameState.ROUND_END.isRunning() ? ChatColor.DARK_GREEN + " +" + addedScore.getOrDefault(currentPlayer, 0) : "";
+			Score score = gameInfo.getScore(
+					currentPlayer.getColor() + bold + currentPlayer.getNickname() + ChatColor.RESET + ChatColor.GRAY + " - " + ChatColor.GOLD + ChatColor.BOLD
+							+ currentPlayer.getScore() + scoreInfo);
 			score.setScore(c++);
 		}
+		Score splitter = gameInfo.getScore(ChatColor.GRAY + " - ");
+		splitter.setScore(c++);
+		if(GameState.isInGame()) {
+			if(MutatorManager.getActiveMutator() != null) {
+				Score mutator = gameInfo.getScore(
+						ChatColor.YELLOW + "Мутатор" + ChatColor.GRAY + ": " + ChatColor.DARK_RED + ChatColor.BOLD + MutatorManager.getActiveMutator().getName());
+				mutator.setScore(c++);
+			}
+			String timer = ModeManager.getActiveMode().hasTime() && GameState.GAME.isRunning() ? ChatColor.AQUA + " " + GameState.getTimer() : "";
+			Score mode = gameInfo.getScore(
+					ChatColor.GREEN + "Режим" + ChatColor.GRAY + ": " + ModeManager.getActiveMode().getColoredName() + timer);
+			mode.setScore(c++);
+		}
+		Score round = gameInfo.getScore(ChatColor.DARK_GREEN + "Раунд" + ChatColor.GRAY + ": " + ChatColor.WHITE + ChatColor.BOLD + MoveOrDie.getPassedRounds());
+		round.setScore(c);
 	}
 
 	public static void createLobbyScoreboard() {

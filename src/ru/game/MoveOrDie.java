@@ -7,6 +7,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.scoreboard.ScoreboardManager;
 import ru.lobby.LobbyEntertainmentHandler;
 import ru.lobby.LobbyParkourHandler;
 import ru.lobby.sign.LobbySignManager;
@@ -48,6 +49,7 @@ public class MoveOrDie implements Listener {
 		if(!GameState.isPlaying()) {
 			Broadcaster.everybody().title(ChatColor.RED + "" + ChatColor.BOLD + "Игра" + ChatColor.BLUE + " Начинается", "", 10, 40, 10);
 			WorldManager.makeWorld();
+			WorldManager.getCurrentGameWorld().setPVP(false);
 
 			List<Player> shuffled = Lists.newArrayList(Bukkit.getOnlinePlayers());
 			Collections.shuffle(shuffled);
@@ -65,9 +67,11 @@ public class MoveOrDie implements Listener {
 				PlayerHandler.reset(player);
 				PlayerHandler.givePlayerEffects(player);
 				player.setGameMode(GameMode.ADVENTURE);
-				ScoreboardHandler.createGameScoreboard(player);
+				player.setInvulnerable(true);
 			}
+			PlayerHandler.getPlayers().forEach(ScoreboardHandler::createGameScoreboard);
 			GameSetupManager.start();
+			ScoreboardHandler.updateGameTeams();
 			LobbySignManager.updateSigns();
 			roundsPassed = 0;
 			roundsToSelectNewMutator = 6;
@@ -91,20 +95,31 @@ public class MoveOrDie implements Listener {
 			ScoreboardHandler.updateScoreboardTeams();
 			ModeManager.cleanup();
 			MutatorSelector.cleanup();
+			ScoreboardHandler.cleanup();
 		}
 	}
 
 	public static void update() {
 		LobbyParkourHandler.update();
-		if(GameState.isPlaying()) {
-			PlayerHandler.update();
-			if(TaskManager.ticksPassed(10)) ScoreboardHandler.updateGameTeams();
-		}
 		if(GameState.SETUP.isRunning()) {
 			GameSetupManager.update();
 		}
 		if(GameState.MUTATOR.isRunning()) {
 			MutatorSelector.update();
+		}
+		if(GameState.ROUND_START.isRunning()) {
+			if(TaskManager.isSecUpdated()) {
+				if(GameState.updateTimer()) {
+					ModeManager.beginRound();
+				} else {
+					if(GameState.getTimer() < 3) {
+						for(Player player : PlayerHandler.getPlayers()) {
+							ChatColor color = (GameState.getTimer() == 2 ? ChatColor.RED : (GameState.getTimer() == 1 ? ChatColor.YELLOW : ChatColor.BLUE));
+							player.sendTitle(color + "" + ChatColor.BOLD + (GameState.getTimer() + 1), "", 0, 20, 1);
+						}
+					}
+				}
+			}
 		}
 		if(GameState.GAME.isRunning()) {
 			ModeManager.update();
@@ -133,6 +148,17 @@ public class MoveOrDie implements Listener {
 		if(GameState.FINALE.isRunning()) {
 			GameFinaleManager.update();
 		}
+		if(GameState.isPlaying()) {
+			PlayerHandler.update();
+		}
+	}
+
+	public static int getPassedRounds() {
+		return roundsPassed;
+	}
+
+	public static void increaseRounds() {
+		roundsPassed++;
 	}
 
 	public static int getScoreToWin() {
@@ -156,8 +182,8 @@ public class MoveOrDie implements Listener {
 	}
 
 	public static String getLogo() {
-		return ChatColor.RED + "" + ChatColor.BOLD + "Move" + ChatColor.RESET + ChatColor.YELLOW + " or " + ChatColor.RESET + ChatColor.BLUE
-				+ ChatColor.BOLD + "Die";
+		return ChatColor.RED + "" + ChatColor.BOLD + "Move" + ChatColor.RESET + ChatColor.YELLOW + " or " + ChatColor.RESET + ChatColor.BLUE + ChatColor.BOLD
+				+ "Die";
 	}
 
 }

@@ -14,7 +14,7 @@ public class ModeFight extends Mode {
 
 	@Override
 	public String getName() {
-		return ChatColor.DARK_RED + "" + ChatColor.BOLD + "Битва!";
+		return "Битва!";
 	}
 
 	@Override
@@ -33,7 +33,7 @@ public class ModeFight extends Mode {
 	}
 
 	@Override
-	public void onStart() {
+	public void onPrepare() {
 		for(Player player : PlayerHandler.getPlayers()) {
 			PlayerInventory inv = player.getInventory();
 			inv.setItem(0, ItemUtils.setUnbreakable(new ItemStack(Material.IRON_SWORD)));
@@ -42,6 +42,11 @@ public class ModeFight extends Mode {
 			inv.setChestplate(ItemUtils.setUnbreakable(new ItemStack(Material.CHAINMAIL_CHESTPLATE)));
 			inv.setHelmet(ItemUtils.setUnbreakable(new ItemStack(Material.CHAINMAIL_HELMET)));
 		}
+	}
+
+	@Override
+	public int getTime() {
+		return 30;
 	}
 
 	@Override

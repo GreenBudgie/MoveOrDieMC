@@ -82,6 +82,12 @@ public class PlayerHandler implements Listener {
 		return deathQueue;
 	}
 
+	public static void resurrectAll() {
+		for(MDPlayer mdPlayer : getGhosts()) {
+			mdPlayer.resurrect();
+		}
+	}
+
 	public static void clearDeathQueue() {
 		deathQueue.clear();
 	}
@@ -133,6 +139,8 @@ public class PlayerHandler implements Listener {
 	public void death(PlayerDeathEvent e) {
 		Player player = e.getEntity();
 		if(isPlaying(player)) {
+			e.setDroppedExp(0);
+			e.getDrops().clear();
 			MDPlayer mdPlayer = MDPlayer.fromPlayer(player);
 			if(mdPlayer != null) mdPlayer.onDeath();
 		}
@@ -143,12 +151,17 @@ public class PlayerHandler implements Listener {
 		Player player = e.getPlayer();
 		if(isPlaying(player)) {
 			MDPlayer mdPlayer = MDPlayer.fromPlayer(player);
-			if(mdPlayer != null && e.getTo() != null && player.isOnGround() && !WorldUtils.compareLocations(e.getFrom(), e.getTo())) {
-				if(player.isSprinting()) {
-					mdPlayer.handleSprintHp();
-				} else {
-					if(!player.isSneaking()) mdPlayer.handleWalkHp();
+			if(GameState.GAME.isRunning()) {
+				if(mdPlayer != null && player.isOnGround() && !WorldUtils.compareLocations(e.getFrom(), e.getTo())) {
+					if(player.isSprinting()) {
+						mdPlayer.handleSprintHp();
+					} else {
+						if(!player.isSneaking()) mdPlayer.handleWalkHp();
+					}
 				}
+			}
+			if(GameState.ROUND_START.isRunning()) {
+				if(!WorldUtils.compareLocations(e.getFrom(), e.getTo())) e.setCancelled(true);
 			}
 		}
 	}

@@ -34,6 +34,7 @@ public class MutatorSelector implements Listener {
 	private static boolean selecting = false;
 
 	public static void start() {
+		PlayerHandler.resurrectAll();
 		List<Location> locations = Lists.newArrayList(MapMutator.getSpawns());
 		Collections.shuffle(locations);
 		for(int i = 0; i < PlayerHandler.getPlayers().size(); i++) {
@@ -57,7 +58,7 @@ public class MutatorSelector implements Listener {
 				}
 				if(GameState.getTimer() == 11) {
 					List<MDPlayer> players = Lists.newArrayList(PlayerHandler.getMDPlayers());
-					if(selectorPlayer != null) players.remove(selectorPlayer);
+					if(selectorPlayer != null && players.size() > 1) players.remove(selectorPlayer);
 					selectorPlayer = MathUtils.choose(players);
 					EntityUtils.teleport(selectorPlayer.getPlayer(), MapMutator.getMutatorSelectorSpawn());
 					List<Mutator> mutators = Lists.newArrayList(MutatorManager.getMutators());

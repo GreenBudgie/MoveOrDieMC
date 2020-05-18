@@ -10,7 +10,7 @@ import java.util.List;
 public class MapMutator {
 
 	private static List<Location> spawns = new ArrayList<>();
-	private static Location mutatorSelectorSpawn = new Location(null, 9, 11, 65);
+	private static Location mutatorSelectorSpawn = new Location(null, 9, 11.5, 65);
 
 	static {
 		spawns.add(new Location(null, 11, 11, 67));
