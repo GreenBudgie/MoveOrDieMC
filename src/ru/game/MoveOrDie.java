@@ -29,6 +29,8 @@ public class MoveOrDie implements Listener {
 	public static final int MAX_PLAYERS = 6, MIN_PLAYERS = 3;
 	private static final Set<ChatColor> availableColors = Sets
 			.newHashSet(ChatColor.RED, ChatColor.GREEN, ChatColor.YELLOW, ChatColor.AQUA, ChatColor.LIGHT_PURPLE, ChatColor.GOLD);
+	private static int roundsPassed = 0, roundsToSelectNewMutator = 6;
+	private static int scoreToWin = 25; //TODO
 
 	public static void init() {
 		Bukkit.getPluginManager().registerEvents(new MoveOrDie(), Plugin.INSTANCE);
@@ -67,6 +69,8 @@ public class MoveOrDie implements Listener {
 			}
 			GameSetupManager.start();
 			LobbySignManager.updateSigns();
+			roundsPassed = 0;
+			roundsToSelectNewMutator = 6;
 		}
 	}
 
@@ -106,6 +110,45 @@ public class MoveOrDie implements Listener {
 			ModeManager.update();
 			MutatorManager.update();
 		}
+		if(GameState.ROUND_END.isRunning()) {
+			if(TaskManager.isSecUpdated() && GameState.updateTimer()) {
+				MDPlayer winner = null;
+				for(MDPlayer player : PlayerHandler.getMDPlayers()) {
+					if(player.getScore() >= getScoreToWin()) {
+						winner = player;
+						break;
+					}
+				}
+				if(winner != null) {
+					GameFinaleManager.start(winner);
+				} else {
+					if(roundsPassed % roundsToSelectNewMutator == 0) {
+						MutatorSelector.start();
+					} else {
+						ModeManager.startNewRound();
+					}
+				}
+			}
+		}
+		if(GameState.FINALE.isRunning()) {
+			GameFinaleManager.update();
+		}
+	}
+
+	public static int getScoreToWin() {
+		return scoreToWin;
+	}
+
+	public static int getWinnerScore() {
+		return PlayerHandler.getMDPlayers().size() + 2;
+	}
+
+	public static int getSecondScore() {
+		return (int) Math.ceil(getWinnerScore() / 2.5);
+	}
+
+	public static int getLoserScore() {
+		return (int) Math.ceil(getWinnerScore() / 4.0);
 	}
 
 	public static Set<ChatColor> getAvailableColors() {

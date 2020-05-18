@@ -1,19 +1,18 @@
 package ru.game;
 
+import com.google.common.collect.Lists;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Objective;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.Team;
+import org.bukkit.scoreboard.*;
 import ru.util.TaskManager;
 
-import java.util.Set;
+import java.util.*;
 
 public class ScoreboardHandler {
 
 	public static Scoreboard lobbyScoreboard;
+	public static Map<MDPlayer, Integer> addedScore = new HashMap<>();
 
 	public static void createGameScoreboard(Player player) {
 		Scoreboard gameScoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
@@ -52,15 +51,20 @@ public class ScoreboardHandler {
 	}
 
 	public static void updateGameScoreboard(Player player) {
-		MDPlayer dqPlayer = MDPlayer.fromPlayer(player);
-		boolean hasDQ = dqPlayer != null;
+		MDPlayer mdPlayer = MDPlayer.fromPlayer(player);
 		Scoreboard board = player.getScoreboard();
 		Objective gameInfo = board.getObjective("gameInfo");
 		if(gameInfo != null) gameInfo.unregister();
 		gameInfo = board.registerNewObjective("gameInfo", "dummy", MoveOrDie.getLogo());
 		gameInfo.setDisplaySlot(DisplaySlot.SIDEBAR);
 		int c = 0;
-
+		List<MDPlayer> sortedPlayers = Lists.newArrayList(PlayerHandler.getMDPlayers());
+		sortedPlayers.sort(Comparator.comparingInt(MDPlayer::getScore));
+		for(MDPlayer currentPlayer : sortedPlayers) {
+			String bold = currentPlayer == mdPlayer ? ChatColor.BOLD + "" : "";
+			Score score = gameInfo.getScore(currentPlayer.getColor() + bold + currentPlayer.getNickname() + " " + ChatColor.GOLD + ChatColor.BOLD + currentPlayer.getScore());
+			score.setScore(c++);
+		}
 	}
 
 	public static void createLobbyScoreboard() {

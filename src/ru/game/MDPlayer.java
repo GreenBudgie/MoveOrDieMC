@@ -7,6 +7,7 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 import ru.util.MathUtils;
+import ru.util.TaskManager;
 
 import javax.annotation.Nullable;
 
@@ -31,6 +32,18 @@ public class MDPlayer {
 		moveBar.setProgress(1);
 		moveBar.addPlayer(player);
 		moveBar.setVisible(true);
+	}
+
+	public int getScore() {
+		return score;
+	}
+
+	public void setScore(int score) {
+		this.score = score;
+	}
+
+	public void addScore(int score) {
+		this.score += score;
 	}
 
 	public String getNickname() {
@@ -62,7 +75,9 @@ public class MDPlayer {
 	}
 
 	public void update() {
-		ScoreboardHandler.updateGameScoreboard(player);
+		if(TaskManager.isSecUpdated()) {
+			ScoreboardHandler.updateGameScoreboard(player);
+		}
 		if(isGhost) {
 			moveBar.setProgress(0);
 			moveBar.setColor(BarColor.WHITE);

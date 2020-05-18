@@ -1,11 +1,12 @@
 package ru.modes;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.bukkit.entity.Player;
+import org.bukkit.ChatColor;
 import ru.game.GameState;
 import ru.game.MDPlayer;
+import ru.game.MoveOrDie;
 import ru.game.PlayerHandler;
+import ru.util.Broadcaster;
 import ru.util.MathUtils;
 
 import java.util.ArrayList;
@@ -61,10 +62,31 @@ public class ModeManager {
 		GameState.GAME.set();
 	}
 
+	private static void addScore(Set<MDPlayer> players, int score) {
+		players.forEach(player -> player.addScore(score));
+	}
+
 	public static void endRound() {
 		boolean draw = PlayerHandler.getAlive().isEmpty();
+		List<Set<MDPlayer>> deathQueue = PlayerHandler.getDeathQueue();
+		//Winners
+		addScore(deathQueue.get(deathQueue.size() - 1), MoveOrDie.getWinnerScore());
+		//Second place
+		if(deathQueue.size() >= 2) {
+			addScore(deathQueue.get(deathQueue.size() - 2), MoveOrDie.getSecondScore());
+		}
+		//Losers
+		if(deathQueue.size() >= 3) {
+			for(int i = 3; i <= deathQueue.size(); i++) {
+				addScore(deathQueue.get(deathQueue.size() - i), MoveOrDie.getLoserScore());
+			}
+		}
+		Broadcaster br = Broadcaster.each(PlayerHandler.getPlayers());
 		if(draw) {
-
+			br.title(ChatColor.RED + "" + ChatColor.BOLD + "Ничья", ChatColor.GRAY + "Никто не победил", 5, 60, 10);
+		} else {
+			MDPlayer winner = deathQueue.get(deathQueue.size() - 1).iterator().next();
+			br.title(winner.getColor() + winner.getNickname(), ChatColor.GREEN + "Победил", 5, 60, 10);
 		}
 		GameState.setTimer(3);
 		GameState.ROUND_END.set();
