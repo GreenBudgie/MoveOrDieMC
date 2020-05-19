@@ -38,6 +38,7 @@ public class MoveOrDie implements Listener {
 	public static void init() {
 		Bukkit.getPluginManager().registerEvents(new MoveOrDie(), Plugin.INSTANCE);
 		Bukkit.getPluginManager().registerEvents(new PlayerHandler(), Plugin.INSTANCE);
+		Bukkit.getPluginManager().registerEvents(new ModeManager(), Plugin.INSTANCE);
 		WorldManager.init();
 		TaskManager.init();
 		LobbyParkourHandler.init();
@@ -141,8 +142,12 @@ public class MoveOrDie implements Listener {
 					GameFinaleManager.start(winner);
 				} else {
 					if(roundsPassed % roundsToSelectNewMutator == 0) {
+						MutatorManager.deactivateMutator();
 						MutatorSelector.start();
 					} else {
+						if(MutatorManager.getActiveMutator() != null) {
+							MutatorManager.getActiveMutator().onRoundEnd();
+						}
 						ModeManager.startNewRound();
 					}
 				}

@@ -7,7 +7,7 @@ import java.util.List;
 
 public class MutatorManager implements Listener {
 
-	private static Mutator activeMutator = null;
+	protected static Mutator activeMutator = null;
 	private static List<Mutator> mutators = new ArrayList<>();
 	public static MutatorJumpBoost JUMP_BOOST = new MutatorJumpBoost();
 	public static MutatorHyperSpeed HYPER_SPEED = new MutatorHyperSpeed();
@@ -25,6 +25,13 @@ public class MutatorManager implements Listener {
 
 	public static Mutator getActiveMutator() {
 		return activeMutator;
+	}
+
+	public static void deactivateMutator() {
+		if(activeMutator != null) {
+			activeMutator.onDeactivate();
+			activeMutator = null;
+		}
 	}
 
 }

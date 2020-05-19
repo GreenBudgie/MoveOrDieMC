@@ -7,9 +7,9 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Piston;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerVelocityEvent;
 import org.bukkit.util.Vector;
 import ru.util.ParticleUtils;
+import ru.util.TaskManager;
 
 public class CustomBlockSpringboard extends CustomBlock {
 
@@ -33,6 +33,7 @@ public class CustomBlockSpringboard extends CustomBlock {
 		if(direction.getZ() != 0) playerVelocity.setZ(0);
 		playerVelocity.add(direction.multiply(1.5));
 		player.setVelocity(playerVelocity);
+		TaskManager.invokeLater(() -> player.setVelocity(playerVelocity), 1L);
 		player.getWorld().playSound(player.getLocation(), Sound.BLOCK_PISTON_EXTEND, 1F, 1.5F);
 		ParticleUtils.createParticlesAround(player, Particle.CLOUD, null, 8);
 		return true;

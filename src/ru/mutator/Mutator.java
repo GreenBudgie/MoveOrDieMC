@@ -13,22 +13,31 @@ public abstract class Mutator {
 	public abstract String getName();
 	public abstract String getDescription();
 
-	public final void activate() {
-		onActivate();
-	}
-
 	public final boolean isActive() {
 		return this == MutatorManager.getActiveMutator();
 	}
 
+	public final void setActive() {
+		MutatorManager.activeMutator = this;
+		onFirstActivate();
+	}
+
+	public void onRoundEnd() {
+	}
+
+	public void onRoundPreEnd() {
+	}
+
+	public void onRoundPrepare() {
+	}
+
+	public void onRoundStart() {
+	}
+
+	public void onFirstActivate() {
+	}
+
 	public void onDeactivate() {
-	}
-
-	public final void deactivate() {
-		onDeactivate();
-	}
-
-	public void onActivate() {
 	}
 
 	public void update() {

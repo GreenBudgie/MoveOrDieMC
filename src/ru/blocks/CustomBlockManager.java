@@ -8,9 +8,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BoundingBox;
-import org.bukkit.util.Vector;
-import ru.util.Broadcaster;
-import ru.util.MathUtils;
 import ru.util.Region;
 
 import java.util.ArrayList;
@@ -44,18 +41,7 @@ public class CustomBlockManager {
 						continue A;
 					}
 				}
-				box.expand(0.3);
-
-				/*Vector moveVector = player.getLocation().toVector().subtract(prevLocs.getOrDefault(player, player.getLocation()).toVector());
-				double negX = 0, negY = 0, negZ = 0, posX = 0, posY = 0, posZ = 0;
-				double m = 1;
-				if(moveVector.getX() < 0) negX = -moveVector.getX() * m;
-				else posX = moveVector.getX() * m;
-				if(moveVector.getY() < 0) negY = -moveVector.getY() * m;
-				else posY = moveVector.getY() * m;
-				if(moveVector.getZ() < 0) negZ = -moveVector.getZ() * m;
-				else posZ = moveVector.getZ() * m;
-				box.expand(negX, negY, negZ, posX, posY, posZ);*/
+				box.expand(0.1);
 
 				Region region = new Region(box);
 				region.setWorld(player.getWorld());
@@ -65,11 +51,12 @@ public class CustomBlockManager {
 						if(customBlock.useFace()) {
 							for(BlockFace face : new BlockFace[] {BlockFace.UP, BlockFace.EAST, BlockFace.WEST, BlockFace.SOUTH, BlockFace.NORTH, BlockFace.DOWN}) {
 								BoundingBox blockBox = currentBlock.getBoundingBox();
-								if(currentBlock.getRelative(face).getType() == Material.AIR && blockBox.expand(face, 1).overlaps(player.getBoundingBox().expand(-0.05))) {
+								if(currentBlock.getRelative(face).getType() == Material.AIR && blockBox.expand(face, 1)
+										.overlaps(player.getBoundingBox().expand(-0.05))) {
 									if(customBlock.onTouch(player, currentBlock, face)) {
 										if(customBlock.getUseDelayTicks() > 0) {
-											BoundingBox bb = BoundingBox.of(currentBlock.getLocation().subtract(1.5, 1.5, 1.5).toVector(),
-													currentBlock.getLocation().add(1.5, 1.5, 1.5).toVector());
+											BoundingBox bb = BoundingBox
+													.of(currentBlock.getLocation().subtract(1, 1, 1), currentBlock.getLocation().add(2, 2, 2));
 											delayedRegions.put(Maps.immutableEntry(bb, customBlock), customBlock.getUseDelayTicks());
 										}
 										break B;

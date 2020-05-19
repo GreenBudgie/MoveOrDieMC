@@ -2,8 +2,15 @@ package ru.modes;
 
 import com.google.common.collect.Sets;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import ru.game.*;
+import ru.mutator.Mutator;
+import ru.mutator.MutatorManager;
+import ru.mutator.MutatorSelector;
 import ru.util.Broadcaster;
 import ru.util.MathUtils;
 import ru.util.TaskManager;
@@ -12,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public class ModeManager {
+public class ModeManager implements Listener {
 
 	private static Mode activeMode = null;
 	private static Set<Mode> availableModes;
@@ -61,6 +68,15 @@ public class ModeManager {
 		PlayerHandler.resurrectAll();
 		PlayerHandler.clearDeathQueue();
 		selectRandomMode().prepare();
+		Mutator mutator = MutatorSelector.getSelectedMutator();
+		if(mutator != null) {
+			if(MutatorManager.getActiveMutator() == null || mutator != MutatorManager.getActiveMutator()) {
+				mutator.setActive();
+			}
+		}
+		if(MutatorManager.getActiveMutator() != null) {
+			MutatorManager.getActiveMutator().onRoundPrepare();
+		}
 		GameState.setTimer(6);
 		GameState.ROUND_START.set();
 	}
@@ -75,6 +91,9 @@ public class ModeManager {
 		} else {
 			GameState.disableTimer();
 		}
+		if(MutatorManager.getActiveMutator() != null) {
+			MutatorManager.getActiveMutator().onRoundStart();
+		}
 		GameState.GAME.set();
 	}
 
@@ -86,6 +105,9 @@ public class ModeManager {
 	}
 
 	public static void endRound() {
+		if(MutatorManager.getActiveMutator() != null) {
+			MutatorManager.getActiveMutator().onRoundPreEnd();
+		}
 		//FIXME Выдает не те очки, иногда выдает 0))))
 		boolean hasAlive = !PlayerHandler.getAlive().isEmpty();
 		List<Set<MDPlayer>> deathQueue = PlayerHandler.getDeathQueue();
@@ -114,6 +136,13 @@ public class ModeManager {
 		MoveOrDie.increaseRounds();
 		GameState.setTimer(5);
 		GameState.ROUND_END.set();
+	}
+
+	@EventHandler
+	public void tntExplosion(EntityExplodeEvent e) {
+		if(e.getEntityType() == EntityType.PRIMED_TNT) {
+			e.blockList().clear();
+		}
 	}
 
 }

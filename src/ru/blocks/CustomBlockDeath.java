@@ -9,6 +9,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Piston;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import ru.game.GameState;
 import ru.game.MDPlayer;
 import ru.game.PlayerHandler;
 import ru.util.EntityUtils;
@@ -25,7 +26,7 @@ public class CustomBlockDeath extends CustomBlock {
 	public boolean onTouch(Player player, Block block, BlockFace face) {
 		if(PlayerHandler.isInLobby(player)) {
 			EntityUtils.sendActionBarInfo(player, ChatColor.DARK_RED + "" + ChatColor.BOLD + "—читай, ты погиб");
-		} else {
+		} else if(GameState.GAME.isRunning()) {
 			MDPlayer mdPlayer = MDPlayer.fromPlayer(player);
 			if(mdPlayer != null) {
 				if(!mdPlayer.isGhost()) {
