@@ -6,8 +6,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.scoreboard.ScoreboardManager;
+import ru.blocks.CustomBlockManager;
 import ru.lobby.LobbyEntertainmentHandler;
 import ru.lobby.LobbyParkourHandler;
 import ru.lobby.sign.LobbySignManager;
@@ -101,6 +103,7 @@ public class MoveOrDie implements Listener {
 
 	public static void update() {
 		LobbyParkourHandler.update();
+		CustomBlockManager.update();
 		if(GameState.SETUP.isRunning()) {
 			GameSetupManager.update();
 		}
