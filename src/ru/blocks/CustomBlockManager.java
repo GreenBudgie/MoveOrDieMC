@@ -21,7 +21,6 @@ public class CustomBlockManager {
 	public static final CustomBlockSpringboard SPRINGBOARD = new CustomBlockSpringboard();
 	public static final CustomBlockDeath DEATH = new CustomBlockDeath();
 	private static Map<Map.Entry<BoundingBox, CustomBlock>, Integer> delayedRegions = new HashMap<>();
-	private static Map<Player, Location> prevLocs = new HashMap<>();
 
 	public static void update() {
 		for(Map.Entry<BoundingBox, CustomBlock> entry : delayedRegions.keySet()) {
@@ -76,7 +75,6 @@ public class CustomBlockManager {
 					}
 				}
 			}
-			prevLocs.put(player, player.getLocation());
 		}
 	}
 

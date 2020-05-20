@@ -3,6 +3,7 @@ package ru.modes;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import ru.game.MDPlayer;
 import ru.game.PlayerHandler;
@@ -37,6 +38,7 @@ public abstract class Mode {
 		map.spreadPlayers();
 		for(Player player : PlayerHandler.getPlayers()) {
 			PlayerHandler.resetNoEffects(player);
+			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1F, 2F);
 			player.sendTitle(getColoredName(), "", 10, 35, 15);
 			player.sendMessage(ChatColor.GRAY + "----- " + getColoredName() + ChatColor.RESET + ChatColor.GRAY + " -----");
 			player.sendMessage("");
@@ -44,7 +46,7 @@ public abstract class Mode {
 			player.sendMessage("");
 			player.sendMessage(ChatColor.GRAY + StringUtils.repeat("-", 12 + getName().length()));
 		}
-		onPrepare();
+		onRoundPrepare();
 	}
 
 	public final void start() {
@@ -52,7 +54,7 @@ public abstract class Mode {
 			player.setInvulnerable(false);
 		}
 		WorldManager.getCurrentGameWorld().setPVP(allowPVP());
-		onStart();
+		onRoundStart();
 	}
 
 	public final void end() {
@@ -60,16 +62,20 @@ public abstract class Mode {
 			player.setInvulnerable(true);
 		}
 		WorldManager.getCurrentGameWorld().setPVP(false);
-		onFinish();
+		onRoundPreEnd();
 	}
 
-	public void onPrepare() {
+	public void onRoundPrepare() {
 	}
 
-	public void onStart() {
+	public void onRoundStart() {
 	}
 
-	public void onFinish() {
+	public void onRoundPreEnd() {
+	}
+
+	public void onRoundEnd() {
+
 	}
 
 	public void onPlayerDeath(MDPlayer mdPlayer) {

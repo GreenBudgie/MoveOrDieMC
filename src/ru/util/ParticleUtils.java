@@ -5,6 +5,7 @@ import de.slikey.effectlib.Effect;
 import de.slikey.effectlib.EffectManager;
 import de.slikey.effectlib.EffectType;
 import de.slikey.effectlib.effect.LineEffect;
+import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -34,6 +35,16 @@ public class ParticleUtils {
 				createLine(start, end, particle, density, color);
 			}
 		}
+	}
+
+
+
+	/**
+	 * Creates a flash effect at the given location
+	 * @param location Location to create a flash
+	 */
+	public static void flash(Location location) {
+		createParticle(location, Particle.FLASH, null);
 	}
 
 	/**
@@ -218,6 +229,113 @@ public class ParticleUtils {
 			y = MathUtils.randomRangeDouble(-r, r);
 		}
 		return l.clone().add(x, y, z);
+	}
+
+	public static ChatColor toChatColor(Color c) {
+		if(c == Color.BLACK) {
+			return ChatColor.BLACK;
+		}
+		if(c == Color.WHITE) {
+			return ChatColor.WHITE;
+		}
+		if(c == Color.ORANGE) {
+			return ChatColor.GOLD;
+		}
+		if(c == Color.YELLOW) {
+			return ChatColor.YELLOW;
+		}
+		if(c == Color.AQUA) {
+			return ChatColor.AQUA;
+		}
+		if(c == Color.BLUE) {
+			return ChatColor.BLUE;
+		}
+		if(c == Color.FUCHSIA) {
+			return ChatColor.LIGHT_PURPLE;
+		}
+		if(c == Color.PURPLE) {
+			return ChatColor.DARK_PURPLE;
+		}
+		if(c == Color.GRAY) {
+			return ChatColor.DARK_GRAY;
+		}
+		if(c == Color.GREEN) {
+			return ChatColor.DARK_GREEN;
+		}
+		if(c == Color.LIME) {
+			return ChatColor.GREEN;
+		}
+		if(c == Color.MAROON) {
+			return ChatColor.DARK_RED;
+		}
+		if(c == Color.NAVY) {
+			return ChatColor.DARK_BLUE;
+		}
+		if(c == Color.OLIVE) {
+			return ChatColor.DARK_GREEN;
+		}
+		if(c == Color.RED) {
+			return ChatColor.RED;
+		}
+		if(c == Color.SILVER) {
+			return ChatColor.GRAY;
+		}
+		if(c == Color.TEAL) {
+			return ChatColor.DARK_AQUA;
+		}
+		return null;
+	}
+
+	public static Color toColor(ChatColor c) {
+		if(c == ChatColor.BLACK) {
+			return Color.BLACK;
+		}
+		if(c == ChatColor.WHITE) {
+			return Color.WHITE;
+		}
+		if(c == ChatColor.GOLD) {
+			return Color.ORANGE;
+		}
+		if(c == ChatColor.YELLOW) {
+			return Color.YELLOW;
+		}
+		if(c == ChatColor.AQUA) {
+			return Color.AQUA;
+		}
+		if(c == ChatColor.BLUE) {
+			return Color.BLUE;
+		}
+		if(c == ChatColor.LIGHT_PURPLE) {
+			return Color.FUCHSIA;
+		}
+		if(c == ChatColor.DARK_PURPLE) {
+			return Color.PURPLE;
+		}
+		if(c == ChatColor.DARK_GRAY) {
+			return Color.GRAY;
+		}
+		if(c == ChatColor.DARK_GREEN) {
+			return Color.GREEN;
+		}
+		if(c == ChatColor.GREEN) {
+			return Color.LIME;
+		}
+		if(c == ChatColor.DARK_RED) {
+			return Color.MAROON;
+		}
+		if(c == ChatColor.DARK_BLUE) {
+			return Color.NAVY;
+		}
+		if(c == ChatColor.RED) {
+			return Color.RED;
+		}
+		if(c == ChatColor.GRAY) {
+			return Color.SILVER;
+		}
+		if(c == ChatColor.DARK_AQUA) {
+			return Color.TEAL;
+		}
+		return null;
 	}
 
 	private static class ParticleEffectPoint extends Effect {

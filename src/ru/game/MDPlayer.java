@@ -2,11 +2,17 @@ package ru.game;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import ru.modes.ModeManager;
 import ru.util.MathUtils;
+import ru.util.ParticleUtils;
 import ru.util.TaskManager;
 
 import javax.annotation.Nullable;
@@ -85,7 +91,7 @@ public class MDPlayer {
 		} else {
 			if(GameState.GAME.isRunning()) {
 				if(moveHP > 0) {
-					//moveHP -= 1;
+					moveHP -= 1;
 				} else {
 					player.setHealth(0);
 				}
@@ -111,8 +117,13 @@ public class MDPlayer {
 		if(!isGhost) {
 			isGhost = true;
 			player.setInvulnerable(true);
+			ParticleUtils.createParticlesInsideSphere(player.getLocation(), 3, Particle.FALLING_LAVA, null, 25);
+			ParticleUtils.createParticlesInsideSphere(player.getLocation(), 2, Particle.REDSTONE, ParticleUtils.toColor(color), 40);
+			player.getWorld().playSound(player.getLocation(), Sound.BLOCK_HONEY_BLOCK_FALL, 1.5F, 0.5F);
+			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 1.5F, 1.5F);
 			PlayerHandler.reset(player);
 			PlayerHandler.giveGhostEffects(player);
+			player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20, 0, false, false));
 			PlayerHandler.setDeathHandle(this);
 			ScoreboardHandler.updateGameTeams();
 		}
@@ -145,6 +156,7 @@ public class MDPlayer {
 
 	public void onDeath() {
 		if(GameState.GAME.isRunning()) {
+			ModeManager.getActiveMode().onPlayerDeath(this);
 			makeGhost();
 		}
 	}

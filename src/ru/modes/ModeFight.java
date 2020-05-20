@@ -33,7 +33,7 @@ public class ModeFight extends Mode {
 	}
 
 	@Override
-	public void onPrepare() {
+	public void onRoundPrepare() {
 		for(Player player : PlayerHandler.getPlayers()) {
 			PlayerInventory inv = player.getInventory();
 			inv.setItem(0, ItemUtils.setUnbreakable(new ItemStack(Material.IRON_SWORD)));

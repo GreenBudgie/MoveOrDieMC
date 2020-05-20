@@ -5,10 +5,9 @@ import com.google.common.collect.Sets;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.scoreboard.ScoreboardManager;
 import ru.blocks.CustomBlockManager;
 import ru.lobby.LobbyEntertainmentHandler;
 import ru.lobby.LobbyParkourHandler;
@@ -50,7 +49,8 @@ public class MoveOrDie implements Listener {
 
 	public static void startGame() {
 		if(!GameState.isPlaying()) {
-			Broadcaster.everybody().title(ChatColor.RED + "" + ChatColor.BOLD + "Игра" + ChatColor.BLUE + " Начинается", "", 10, 40, 10);
+			Broadcaster.everybody().title(ChatColor.RED + "" + ChatColor.BOLD + "Игра" + ChatColor.BLUE + " Начинается", "", 10, 40, 10)
+					.sound(Sound.BLOCK_NOTE_BLOCK_BELL, 1F, 1.5F);
 			WorldManager.makeWorld();
 			WorldManager.getCurrentGameWorld().setPVP(false);
 
@@ -120,6 +120,8 @@ public class MoveOrDie implements Listener {
 						for(Player player : PlayerHandler.getPlayers()) {
 							ChatColor color = (GameState.getTimer() == 2 ? ChatColor.RED : (GameState.getTimer() == 1 ? ChatColor.YELLOW : ChatColor.BLUE));
 							player.sendTitle(color + "" + ChatColor.BOLD + (GameState.getTimer() + 1), "", 0, 20, 1);
+							player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 1,
+									GameState.getTimer() == 2 ? 1 : (GameState.getTimer() == 1 ? 0.75F : 0.5F));
 						}
 					}
 				}

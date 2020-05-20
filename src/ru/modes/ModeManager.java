@@ -2,6 +2,7 @@ package ru.modes;
 
 import com.google.common.collect.Sets;
 import org.bukkit.ChatColor;
+import org.bukkit.Sound;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -84,6 +85,7 @@ public class ModeManager implements Listener {
 	public static void beginRound() {
 		for(Player player : PlayerHandler.getPlayers()) {
 			player.sendTitle(ChatColor.DARK_RED + "" + ChatColor.BOLD + "GO", "", 0, 20, 5);
+			player.playSound(player.getLocation(), Sound.ITEM_FIRECHARGE_USE, 1F, 1.8F);
 		}
 		activeMode.start();
 		if(activeMode.hasTime()) {

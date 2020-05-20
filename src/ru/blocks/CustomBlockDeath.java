@@ -1,9 +1,6 @@
 package ru.blocks;
 
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Piston;
@@ -31,6 +28,7 @@ public class CustomBlockDeath extends CustomBlock {
 			if(mdPlayer != null) {
 				if(!mdPlayer.isGhost()) {
 					player.setHealth(0);
+					ParticleUtils.createParticlesInRange(block.getLocation().add(0.5, 0.5, 0.5), 2, Particle.REDSTONE, Color.RED, 40);
 				}
 			}
 		}
