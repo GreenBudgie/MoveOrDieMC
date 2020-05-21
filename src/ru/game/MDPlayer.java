@@ -9,10 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import ru.modes.ModeManager;
-import ru.util.EntityUtils;
-import ru.util.MathUtils;
-import ru.util.ParticleUtils;
-import ru.util.TaskManager;
+import ru.util.*;
 
 import javax.annotation.Nullable;
 
@@ -21,7 +18,7 @@ import javax.annotation.Nullable;
  */
 public class MDPlayer {
 
-	private final int maxMoveHP = 80;
+	private final int maxMoveHP = 160;
 	private String nickname;
 	private Player player;
 	private ChatColor color;
@@ -85,11 +82,11 @@ public class MDPlayer {
 	}
 
 	public void handleSprintHp() {
-		moveHP = MathUtils.clamp(moveHP + 4, 0, maxMoveHP);
+		moveHP = MathUtils.clamp(moveHP + 8, 0, maxMoveHP);
 	}
 
 	public void handleWalkHp() {
-		moveHP = MathUtils.clamp(moveHP + 3, 0, maxMoveHP);
+		moveHP = MathUtils.clamp(moveHP + 5, 0, maxMoveHP);
 	}
 
 	private void updateActionBar() {
@@ -97,8 +94,8 @@ public class MDPlayer {
 		final int toShow = 20;
 		if(isGhost) {
 			String result =
-					ChatColor.DARK_RED + "" + ChatColor.BOLD + "< " + ChatColor.RESET + ChatColor.GRAY + StringUtils.repeat(symbol, toShow) + ChatColor.DARK_RED
-							+ ChatColor.BOLD + " >";
+					ChatColor.DARK_RED + "" + ChatColor.BOLD + "\u274C " + ChatColor.RESET + ChatColor.GRAY + StringUtils.repeat(symbol, toShow) + ChatColor.DARK_RED
+							+ ChatColor.BOLD + " \u274C";
 			EntityUtils.sendActionBarInfo(player, result);
 		} else {
 			double value = (moveHP / (double) maxMoveHP);
@@ -137,9 +134,9 @@ public class MDPlayer {
 			if(GameState.GAME.isRunning()) {
 				if(moveHP > 0) {
 					if(player.isOnGround()) {
-						moveHP -= 2;
+						moveHP -= 4;
 					} else {
-						moveHP -= 1;
+						moveHP -= 2;
 					}
 				} else {
 					player.setHealth(0);
@@ -207,6 +204,7 @@ public class MDPlayer {
 
 	public void onDeath() {
 		if(GameState.GAME.isRunning()) {
+			Broadcaster.each(PlayerHandler.getPlayers()).toChat(ChatColor.DARK_RED + "" + ChatColor.BOLD + "\u274C " + ChatColor.RESET + color + nickname);
 			ModeManager.getActiveMode().onPlayerDeath(this);
 			makeGhost();
 		}

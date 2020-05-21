@@ -63,7 +63,7 @@ public class MutatorSelector implements Listener {
 					List<Mutator> mutators = Lists.newArrayList(MutatorManager.getMutators());
 					if(selectedMutator != null) mutators.remove(selectedMutator);
 					Broadcaster br = Broadcaster.each(PlayerHandler.getPlayers());
-					br.sound(Sound.BLOCK_BELL_USE, 1F, 0.6F);
+					br.sound(Sound.BLOCK_NOTE_BLOCK_BELL, 1F, 0.7F);
 					br.title(selectorPlayer.getColor() + selectorPlayer.getNickname(), null, 0, 60, 10);
 					for(int i = 0; i < 3; i++) {
 						Mutator current = MathUtils.choose(mutators);

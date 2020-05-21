@@ -8,10 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import ru.modes.ModeManager;
@@ -136,7 +133,24 @@ public class PlayerHandler implements Listener {
 	}
 
 	@EventHandler
+	public void chat(AsyncPlayerChatEvent e) {
+		e.setCancelled(true);
+		Player sender = e.getPlayer();
+		String msg = e.getMessage();
+		if(isInLobby(sender)) {
+			Broadcaster.inWorld(WorldManager.getLobby()).toChat(ChatColor.GOLD + sender.getName() + ChatColor.GRAY + ChatColor.BOLD + " > " + ChatColor.RESET + ChatColor.WHITE + msg);
+		}
+		if(isPlaying(sender)) {
+			MDPlayer mdPlayer = MDPlayer.fromPlayer(sender);
+			if(mdPlayer != null) {
+				Broadcaster.each(getPlayers()).toChat(mdPlayer.getColor() + mdPlayer.getNickname() + ChatColor.GRAY + ChatColor.BOLD + " > " + ChatColor.RESET + ChatColor.WHITE + msg);
+			}
+		}
+	}
+
+	@EventHandler
 	public void death(PlayerDeathEvent e) {
+		e.setDeathMessage(null);
 		Player player = e.getEntity();
 		if(isPlaying(player)) {
 			e.setDroppedExp(0);

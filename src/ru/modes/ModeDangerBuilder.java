@@ -48,7 +48,7 @@ public class ModeDangerBuilder extends Mode implements Listener {
 		for(Player player : PlayerHandler.getPlayers()) {
 			PlayerInventory inv = player.getInventory();
 			inv.setItem(0, new ItemStack(Material.REDSTONE_BLOCK, 64));
-			inv.setItem(1, ItemUtils.builder(Material.DIAMOND_PICKAXE).unbreakable().withEnchantments(new ItemUtils.Enchant(Enchantment.DIG_SPEED, 5)).build());
+			inv.setItem(1, ItemUtils.builder(Material.DIAMOND_PICKAXE).unbreakable().withEnchantments(new ItemUtils.Enchant(Enchantment.DIG_SPEED, 10)).build());
 		}
 	}
 

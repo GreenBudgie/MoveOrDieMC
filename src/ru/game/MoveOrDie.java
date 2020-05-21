@@ -7,7 +7,10 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.BlockPistonRetractEvent;
 import ru.blocks.CustomBlockManager;
 import ru.lobby.LobbyEntertainmentHandler;
 import ru.lobby.LobbyParkourHandler;
@@ -196,6 +199,16 @@ public class MoveOrDie implements Listener {
 	public static String getLogo() {
 		return ChatColor.RED + "" + ChatColor.BOLD + "Move" + ChatColor.RESET + ChatColor.YELLOW + " or " + ChatColor.RESET + ChatColor.BLUE + ChatColor.BOLD
 				+ "Die";
+	}
+
+	@EventHandler
+	public void piston(BlockPistonExtendEvent e) {
+		e.setCancelled(true);
+	}
+
+	@EventHandler
+	public void piston(BlockPistonRetractEvent e) {
+		e.setCancelled(true);
 	}
 
 }

@@ -77,9 +77,10 @@ public class ScoreboardHandler {
 		sortedPlayers.sort(Comparator.comparingInt(MDPlayer::getScore));
 		for(MDPlayer currentPlayer : sortedPlayers) {
 			String bold = currentPlayer == mdPlayer ? ChatColor.BOLD + "" : "";
+			String dead = currentPlayer.isGhost() && GameState.GAME.isRunning() ? ChatColor.STRIKETHROUGH + "" : "";
 			String scoreInfo = GameState.ROUND_END.isRunning() ? ChatColor.DARK_GREEN + " +" + addedScore.getOrDefault(currentPlayer, 0) : "";
 			Score score = gameInfo.getScore(
-					currentPlayer.getColor() + bold + currentPlayer.getNickname() + ChatColor.RESET + ChatColor.GRAY + " - " + ChatColor.GOLD + ChatColor.BOLD
+					currentPlayer.getColor() + bold + dead + currentPlayer.getNickname() + ChatColor.RESET + ChatColor.GRAY + " - " + ChatColor.GOLD + ChatColor.BOLD
 							+ currentPlayer.getScore() + scoreInfo);
 			score.setScore(c++);
 		}
