@@ -1,15 +1,16 @@
 package ru.modes;
 
 import org.apache.commons.lang.StringUtils;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
 import ru.game.MDPlayer;
 import ru.game.PlayerHandler;
 import ru.game.WorldManager;
 import ru.map.GameMap;
 import ru.map.MapManager;
+import ru.start.Plugin;
 
 public abstract class Mode {
 
@@ -34,6 +35,7 @@ public abstract class Mode {
 	}
 
 	public final void prepare() {
+		WorldManager.getCurrentGameWorld().setPVP(false);
 		GameMap map = MapManager.useMapForMode(this);
 		map.spreadPlayers();
 		for(Player player : PlayerHandler.getPlayers()) {
@@ -45,6 +47,7 @@ public abstract class Mode {
 			player.sendMessage(ChatColor.GREEN + getDescription());
 			player.sendMessage("");
 			player.sendMessage(ChatColor.GRAY + StringUtils.repeat("-", 12 + getName().length()));
+			player.setGameMode(useSurvivalGameMode() ? GameMode.SURVIVAL : GameMode.ADVENTURE);
 		}
 		onRoundPrepare();
 	}
@@ -54,6 +57,9 @@ public abstract class Mode {
 			player.setInvulnerable(false);
 		}
 		WorldManager.getCurrentGameWorld().setPVP(allowPVP());
+		if(this instanceof Listener) {
+			Bukkit.getPluginManager().registerEvents((Listener) this, Plugin.INSTANCE);
+		}
 		onRoundStart();
 	}
 
@@ -62,6 +68,9 @@ public abstract class Mode {
 			player.setInvulnerable(true);
 		}
 		WorldManager.getCurrentGameWorld().setPVP(false);
+		if(this instanceof Listener) {
+			HandlerList.unregisterAll((Listener) this);
+		}
 		onRoundPreEnd();
 	}
 
@@ -75,13 +84,24 @@ public abstract class Mode {
 	}
 
 	public void onRoundEnd() {
-
 	}
 
 	public void onPlayerDeath(MDPlayer mdPlayer) {
 	}
 
+	public boolean useSurvivalGameMode() {
+		return false;
+	}
+
 	public boolean allowPVP() {
+		return false;
+	}
+
+	public boolean allowBlockBreaking() {
+		return false;
+	}
+
+	public boolean allowBlockPlacing() {
 		return false;
 	}
 

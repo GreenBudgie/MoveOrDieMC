@@ -12,6 +12,9 @@ import ru.game.PlayerHandler;
 import ru.util.EntityUtils;
 import ru.util.ParticleUtils;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class CustomBlockDeath extends CustomBlock {
 
 	@Override
@@ -28,16 +31,11 @@ public class CustomBlockDeath extends CustomBlock {
 			if(mdPlayer != null) {
 				if(!mdPlayer.isGhost()) {
 					player.setHealth(0);
-					ParticleUtils.createParticlesInRange(block.getLocation().add(0.5, 0.5, 0.5), 2, Particle.REDSTONE, Color.RED, 40);
+					ParticleUtils.createParticlesInRange(block.getLocation().add(0.5, 0.5, 0.5), 2, Particle.SPELL_MOB, Color.RED, 40);
 				}
 			}
 		}
 		return true;
-	}
-
-	@Override
-	public int getUseDelayTicks() {
-		return 0;
 	}
 
 }

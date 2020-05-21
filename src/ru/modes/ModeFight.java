@@ -36,7 +36,7 @@ public class ModeFight extends Mode {
 	public void onRoundPrepare() {
 		for(Player player : PlayerHandler.getPlayers()) {
 			PlayerInventory inv = player.getInventory();
-			inv.setItem(0, ItemUtils.setUnbreakable(new ItemStack(Material.IRON_SWORD)));
+			inv.setItem(0, ItemUtils.setUnbreakable(new ItemStack(Material.DIAMOND_SWORD)));
 			inv.setBoots(ItemUtils.setUnbreakable(new ItemStack(Material.CHAINMAIL_BOOTS)));
 			inv.setLeggings(ItemUtils.setUnbreakable(new ItemStack(Material.CHAINMAIL_LEGGINGS)));
 			inv.setChestplate(ItemUtils.setUnbreakable(new ItemStack(Material.CHAINMAIL_CHESTPLATE)));

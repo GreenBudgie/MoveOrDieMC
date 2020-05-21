@@ -60,8 +60,16 @@ public class MapManager {
 
 	public static GameMap useMapForMode(Mode mode) {
 		GameMap gameMap = MathUtils.choose(maps.stream().filter(map -> map.getSupportedModes().contains(mode)).collect(Collectors.toList()));
-		usedMaps.add(gameMap);
+		if(usedMaps.contains(gameMap)) {
+			gameMap.reset();
+		} else {
+			usedMaps.add(gameMap);
+		}
 		return gameMap;
+	}
+
+	public static void cleanup() {
+		usedMaps.clear();
 	}
 
 }

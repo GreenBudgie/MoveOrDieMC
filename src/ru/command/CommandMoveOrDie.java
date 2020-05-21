@@ -1,6 +1,7 @@
 package ru.command;
 
 import com.google.common.collect.Lists;
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.block.Sign;
 import org.bukkit.command.Command;
@@ -8,15 +9,15 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
-import ru.game.GameSetupManager;
-import ru.game.MoveOrDie;
-import ru.game.PlayerHandler;
-import ru.game.WorldManager;
+import ru.game.*;
 import ru.lobby.LobbyParkour;
 import ru.lobby.LobbyParkourHandler;
+import ru.modes.Mode;
+import ru.modes.ModeManager;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CommandMoveOrDie implements CommandExecutor, TabCompleter {
 
@@ -51,6 +52,20 @@ public class CommandMoveOrDie implements CommandExecutor, TabCompleter {
 			if(args[0].equalsIgnoreCase("effects")) {
 				PlayerHandler.givePlayerEffects(player);
 			}
+			if(GameState.isPlaying() && args[0].equalsIgnoreCase("mode")) {
+				if(args.length >= 3 && args[1].equalsIgnoreCase("switch")) {
+					Mode toSwitch = ModeManager.getByID(args[2]);
+					if(toSwitch != null) {
+						ModeManager.endRound();
+						ModeManager.startNewRound(toSwitch);
+					} else {
+						player.sendMessage(ChatColor.RED + "Incorrect mode");
+					}
+				}
+				if(args.length >= 2 && args[1].equalsIgnoreCase("end")) {
+					ModeManager.endRound();
+				}
+			}
 		}
 		return true;
 	}
@@ -58,7 +73,13 @@ public class CommandMoveOrDie implements CommandExecutor, TabCompleter {
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
 		if(args.length == 1) {
-			return getMatchingStrings(args, "start", "end", "mainworld", "parkour_reset", "effects");
+			return getMatchingStrings(args, "start", "end", "mainworld", "parkour_reset", "effects", "mode");
+		}
+		if(args.length == 2 && args[0].equalsIgnoreCase("mode")) {
+			return getMatchingStrings(args, "switch", "end");
+		}
+		if(args.length == 3 && args[0].equalsIgnoreCase("mode") && args[1].equalsIgnoreCase("switch")) {
+			return getMatchingStrings(args, ModeManager.getModes().stream().map(Mode::getID).collect(Collectors.toList()));
 		}
 		if(args.length == 2 && args[0].equalsIgnoreCase("start")) {
 			return getMatchingStrings(args, "mutator", "game");

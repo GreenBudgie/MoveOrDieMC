@@ -1,9 +1,7 @@
 package ru.game;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import org.apache.commons.lang.StringUtils;
+import org.bukkit.*;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
@@ -11,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import ru.modes.ModeManager;
+import ru.util.EntityUtils;
 import ru.util.MathUtils;
 import ru.util.ParticleUtils;
 import ru.util.TaskManager;
@@ -22,12 +21,12 @@ import javax.annotation.Nullable;
  */
 public class MDPlayer {
 
+	private final int maxMoveHP = 80;
 	private String nickname;
 	private Player player;
 	private ChatColor color;
 	private boolean isGhost = false;
 	private BossBar moveBar;
-	private final int maxMoveHP = 80;
 	private int moveHP = maxMoveHP;
 	private int score = 0;
 
@@ -38,6 +37,19 @@ public class MDPlayer {
 		moveBar.setProgress(1);
 		moveBar.addPlayer(player);
 		moveBar.setVisible(true);
+	}
+
+	/**
+	 * Gets the MDPlayer from a specific player
+	 * @param player The player
+	 * @return An MDPlayer, or null if not present
+	 */
+	@Nullable
+	public static MDPlayer fromPlayer(Player player) {
+		for(MDPlayer mdplayer : PlayerHandler.getMDPlayers()) {
+			if(player.getName().equals(mdplayer.nickname)) return mdplayer;
+		}
+		return null;
 	}
 
 	public int getScore() {
@@ -73,11 +85,44 @@ public class MDPlayer {
 	}
 
 	public void handleSprintHp() {
-		moveHP = MathUtils.clamp(moveHP + 2, 0, maxMoveHP);
+		moveHP = MathUtils.clamp(moveHP + 4, 0, maxMoveHP);
 	}
 
 	public void handleWalkHp() {
-		moveHP = MathUtils.clamp(moveHP + 1, 0, maxMoveHP);
+		moveHP = MathUtils.clamp(moveHP + 3, 0, maxMoveHP);
+	}
+
+	private void updateActionBar() {
+		String symbol = "\u2764";
+		final int toShow = 20;
+		if(isGhost) {
+			String result =
+					ChatColor.DARK_RED + "" + ChatColor.BOLD + "< " + ChatColor.RESET + ChatColor.GRAY + StringUtils.repeat(symbol, toShow) + ChatColor.DARK_RED
+							+ ChatColor.BOLD + " >";
+			EntityUtils.sendActionBarInfo(player, result);
+		} else {
+			double value = (moveHP / (double) maxMoveHP);
+			int alive = (int) Math.round(value * toShow);
+			int dead = toShow - alive;
+			int arrowCount = 1;
+			ChatColor color, arrowsColor;
+			if(value > 0.5) {
+				color = ChatColor.GREEN;
+				arrowsColor = ChatColor.GRAY;
+			} else if(value > 0.25) {
+				arrowCount = (int) Math.round(5 - value * 8);
+				color = ChatColor.YELLOW;
+				arrowsColor = ChatColor.RED;
+			} else {
+				arrowCount = (int) Math.round(7 - value * 16);
+				color = ChatColor.RED;
+				arrowsColor = ChatColor.DARK_RED;
+			}
+			String result = arrowsColor + "" + ChatColor.BOLD + StringUtils.repeat("<", arrowCount) + " " + ChatColor.RESET;
+			result += color + StringUtils.repeat(symbol, alive);
+			result += ChatColor.DARK_GRAY + StringUtils.repeat(symbol, dead) + arrowsColor + ChatColor.BOLD + " " + StringUtils.repeat(">", arrowCount);
+			EntityUtils.sendActionBarInfo(player, result);
+		}
 	}
 
 	public void update() {
@@ -91,7 +136,11 @@ public class MDPlayer {
 		} else {
 			if(GameState.GAME.isRunning()) {
 				if(moveHP > 0) {
-					moveHP -= 1;
+					if(player.isOnGround()) {
+						moveHP -= 2;
+					} else {
+						moveHP -= 1;
+					}
 				} else {
 					player.setHealth(0);
 				}
@@ -108,6 +157,7 @@ public class MDPlayer {
 			}
 			moveBar.setProgress(value);
 		}
+		updateActionBar();
 	}
 
 	/**
@@ -123,6 +173,7 @@ public class MDPlayer {
 			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 1.5F, 1.5F);
 			PlayerHandler.reset(player);
 			PlayerHandler.giveGhostEffects(player);
+			player.setGameMode(GameMode.SURVIVAL);
 			player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20, 0, false, false));
 			PlayerHandler.setDeathHandle(this);
 			ScoreboardHandler.updateGameTeams();
@@ -159,19 +210,6 @@ public class MDPlayer {
 			ModeManager.getActiveMode().onPlayerDeath(this);
 			makeGhost();
 		}
-	}
-
-	/**
-	 * Gets the MDPlayer from a specific player
-	 * @param player The player
-	 * @return An MDPlayer, or null if not present
-	 */
-	@Nullable
-	public static MDPlayer fromPlayer(Player player) {
-		for(MDPlayer mdplayer : PlayerHandler.getMDPlayers()) {
-			if(player.getName().equals(mdplayer.nickname)) return mdplayer;
-		}
-		return null;
 	}
 
 }

@@ -2,6 +2,7 @@ package ru.blocks;
 
 import com.google.common.collect.Maps;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -10,36 +11,22 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.BoundingBox;
 import ru.util.Region;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class CustomBlockManager {
 
 	public static final List<CustomBlock> customBlocks = new ArrayList<>();
 	public static final CustomBlockSpringboard SPRINGBOARD = new CustomBlockSpringboard();
 	public static final CustomBlockDeath DEATH = new CustomBlockDeath();
-	private static Map<Map.Entry<BoundingBox, CustomBlock>, Integer> delayedRegions = new HashMap<>();
+	public static final CustomBlockGlass GLASS = new CustomBlockGlass();
 
 	public static void update() {
-		for(Map.Entry<BoundingBox, CustomBlock> entry : delayedRegions.keySet()) {
-			int ticks = delayedRegions.get(entry);
-			if(ticks <= 0) {
-				delayedRegions.remove(entry);
-			} else {
-				delayedRegions.replace(entry, ticks - 1);
-			}
-		}
+		customBlocks.forEach(CustomBlock::update);
 		for(Player player : Bukkit.getOnlinePlayers()) {
+			if(player.getGameMode() == GameMode.SPECTATOR) continue;
 			A:
 			for(CustomBlock customBlock : customBlocks) {
 				BoundingBox box = player.getBoundingBox();
-				for(Map.Entry<BoundingBox, CustomBlock> entry : delayedRegions.keySet()) {
-					if(entry.getValue() == customBlock && entry.getKey().overlaps(box)) {
-						continue A;
-					}
-				}
 				box.expand(0.1);
 
 				Region region = new Region(box);
@@ -53,22 +40,12 @@ public class CustomBlockManager {
 								if(currentBlock.getRelative(face).getType() == Material.AIR && blockBox.expand(face, 1)
 										.overlaps(player.getBoundingBox().expand(-0.05))) {
 									if(customBlock.onTouch(player, currentBlock, face)) {
-										if(customBlock.getUseDelayTicks() > 0) {
-											BoundingBox bb = BoundingBox
-													.of(currentBlock.getLocation().subtract(1, 1, 1), currentBlock.getLocation().add(2, 2, 2));
-											delayedRegions.put(Maps.immutableEntry(bb, customBlock), customBlock.getUseDelayTicks());
-										}
 										break B;
 									}
 								}
 							}
 						} else {
 							if(customBlock.onTouch(player, currentBlock, null)) {
-								if(customBlock.getUseDelayTicks() > 0) {
-									BoundingBox bb = BoundingBox.of(currentBlock.getLocation().subtract(1.5, 1.5, 1.5).toVector(),
-											currentBlock.getLocation().add(1.5, 1.5, 1.5).toVector());
-									delayedRegions.put(Maps.immutableEntry(bb, customBlock), customBlock.getUseDelayTicks());
-								}
 								break;
 							}
 						}

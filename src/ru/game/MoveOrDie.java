@@ -28,7 +28,7 @@ import java.util.Set;
 public class MoveOrDie implements Listener {
 
 	public static final boolean TEST = true; //FIXME Remove on release
-	public static final int MAX_PLAYERS = 6, MIN_PLAYERS = 3;
+	public static final int MAX_PLAYERS = 6;
 	private static final Set<ChatColor> availableColors = Sets
 			.newHashSet(ChatColor.RED, ChatColor.GREEN, ChatColor.YELLOW, ChatColor.AQUA, ChatColor.LIGHT_PURPLE, ChatColor.GOLD);
 	private static int roundsPassed = 0, roundsToSelectNewMutator = 6;
@@ -91,7 +91,7 @@ public class MoveOrDie implements Listener {
 				player.setInvulnerable(false);
 				mdPlayer.cleanup();
 			}
-			WorldManager.deleteWorld();
+			MapManager.cleanup();
 			PlayerHandler.getMDPlayers().clear();
 			GameState.STOPPED.set();
 			LobbySignManager.updateSigns();
@@ -99,6 +99,7 @@ public class MoveOrDie implements Listener {
 			ModeManager.cleanup();
 			MutatorSelector.cleanup();
 			ScoreboardHandler.cleanup();
+			WorldManager.deleteWorld();
 		}
 	}
 
@@ -143,6 +144,7 @@ public class MoveOrDie implements Listener {
 				if(winner != null) {
 					GameFinaleManager.start(winner);
 				} else {
+					ModeManager.getActiveMode().onRoundEnd();
 					if(roundsPassed % roundsToSelectNewMutator == 0) {
 						MutatorManager.deactivateMutator();
 						MutatorSelector.start();

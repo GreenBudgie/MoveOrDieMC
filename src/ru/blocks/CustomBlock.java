@@ -13,12 +13,14 @@ public abstract class CustomBlock {
 		CustomBlockManager.customBlocks.add(this);
 	}
 
+	public void update() {
+	}
+
 	public boolean useFace() {
 		return false;
 	}
 
 	public abstract Material getType();
 	public abstract boolean onTouch(Player player, Block block, @Nullable BlockFace face);
-	public abstract int getUseDelayTicks();
 
 }

@@ -6,7 +6,10 @@ import org.bukkit.Sound;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import ru.game.*;
 import ru.mutator.Mutator;
@@ -16,6 +19,7 @@ import ru.util.Broadcaster;
 import ru.util.MathUtils;
 import ru.util.TaskManager;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -26,6 +30,8 @@ public class ModeManager implements Listener {
 	private static Set<Mode> availableModes;
 	private static List<Mode> modes = new ArrayList<>();
 	public static ModeFight FIGHT = new ModeFight();
+	public static ModeSpleef SPLEEF = new ModeSpleef();
+	public static ModeDangerBuilder DANGER_BUILDER = new ModeDangerBuilder();
 
 	public static List<Mode> getModes() {
 		return modes;
@@ -54,21 +60,34 @@ public class ModeManager implements Listener {
 
 	public static void cleanup() {
 		availableModes.clear();
+		if(activeMode != null) {
+			if(activeMode instanceof Listener) {
+				HandlerList.unregisterAll((Listener) activeMode);
+			}
+		}
 	}
 
-	public static Mode selectRandomMode() {
+	public static void selectRandomMode() {
 		if(availableModes.isEmpty()) {
 			setup();
 		}
 		activeMode = MathUtils.choose(availableModes);
 		availableModes.remove(activeMode);
-		return activeMode;
 	}
 
 	public static void startNewRound() {
+		startNewRound(null);
+	}
+
+	public static void startNewRound(@Nullable Mode mode) {
 		PlayerHandler.resurrectAll();
 		PlayerHandler.clearDeathQueue();
-		selectRandomMode().prepare();
+		if(mode == null) {
+			selectRandomMode();
+		} else {
+			activeMode = mode;
+		}
+		activeMode.prepare();
 		Mutator mutator = MutatorSelector.getSelectedMutator();
 		if(mutator != null) {
 			if(MutatorManager.getActiveMutator() == null || mutator != MutatorManager.getActiveMutator()) {
@@ -110,6 +129,7 @@ public class ModeManager implements Listener {
 		if(MutatorManager.getActiveMutator() != null) {
 			MutatorManager.getActiveMutator().onRoundPreEnd();
 		}
+		activeMode.end();
 		//FIXME Выдает не те очки, иногда выдает 0))))
 		boolean hasAlive = !PlayerHandler.getAlive().isEmpty();
 		List<Set<MDPlayer>> deathQueue = PlayerHandler.getDeathQueue();
@@ -144,6 +164,28 @@ public class ModeManager implements Listener {
 	public void tntExplosion(EntityExplodeEvent e) {
 		if(e.getEntityType() == EntityType.PRIMED_TNT) {
 			e.blockList().clear();
+		}
+	}
+
+	@EventHandler
+	public void blockPlace(BlockPlaceEvent e) {
+		if(PlayerHandler.isPlaying(e.getPlayer())) {
+			if(!GameState.GAME.isRunning()) {
+				e.setCancelled(true);
+			} else {
+				if(!activeMode.allowBlockPlacing()) e.setCancelled(true);
+			}
+		}
+	}
+
+	@EventHandler
+	public void blockBreak(BlockBreakEvent e) {
+		if(PlayerHandler.isPlaying(e.getPlayer())) {
+			if(!GameState.GAME.isRunning()) {
+				e.setCancelled(true);
+			} else {
+				if(!activeMode.allowBlockBreaking()) e.setCancelled(true);
+			}
 		}
 	}
 

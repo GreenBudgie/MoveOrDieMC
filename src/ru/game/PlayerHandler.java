@@ -44,7 +44,7 @@ public class PlayerHandler implements Listener {
 	}
 
 	public static boolean isInLobby(Player p) {
-		return WorldManager.getLobby().getPlayers().stream().anyMatch(p::equals);
+		return WorldManager.getLobby().getPlayers().contains(p)|| WorldManager.getOriginalGameWorld().getPlayers().contains(p);
 	}
 
 	public static boolean isPlaying(Player player) {
