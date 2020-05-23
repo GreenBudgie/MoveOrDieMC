@@ -89,6 +89,23 @@ public abstract class Mode {
 	public void onPlayerDeath(MDPlayer mdPlayer) {
 	}
 
+	/**
+	 * Determines whether to start sudden death after the round ends
+	 * @return Whether to allow sudden death
+	 */
+	public boolean allowSuddenDeath() {
+		return true;
+	}
+
+	/**
+	 * Whether to use point system in this mode
+	 * Ex: in FIGHT it must count the number of kills by player. If 2 or more players survived it must give the winner status to a player with the most points
+	 * @return Whether to use point system
+	 */
+	public boolean usePoints() {
+		return true;
+	}
+
 	public boolean useSurvivalGameMode() {
 		return false;
 	}

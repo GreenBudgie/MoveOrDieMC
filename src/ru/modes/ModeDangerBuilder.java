@@ -1,8 +1,12 @@
 package ru.modes;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Multimap;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.craftbukkit.libs.jline.internal.Nullable;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -16,12 +20,11 @@ import ru.game.PlayerHandler;
 import ru.util.Broadcaster;
 import ru.util.ItemUtils;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class ModeDangerBuilder extends Mode implements Listener {
 
-	private Set<Location> placedBlocks = new HashSet<>();
+	private ListMultimap<Player, Location> placedBlocks = ArrayListMultimap.create();
 
 	@Override
 	public String getName() {
@@ -30,7 +33,7 @@ public class ModeDangerBuilder extends Mode implements Listener {
 
 	@Override
 	public String getDescription() {
-		return "Убивай игроков, ставя перед ними смертельные блоки";
+		return "Убивай игроков, ставя перед ними смертельные блоки. Блоки нельзя ставить друг на друга!";
 	}
 
 	@Override
@@ -52,9 +55,17 @@ public class ModeDangerBuilder extends Mode implements Listener {
 		}
 	}
 
+	@Nullable
+	public Player getWhoPlacedBlock(Block block) {
+		for(Player player : placedBlocks.keySet()) {
+			if(placedBlocks.get(player).contains(block.getLocation())) return player;
+		}
+		return null;
+	}
+
 	@Override
 	public int getTime() {
-		return 60;
+		return 50;
 	}
 
 	@Override
@@ -79,9 +90,14 @@ public class ModeDangerBuilder extends Mode implements Listener {
 	@EventHandler(priority = EventPriority.HIGH)
 	public void blockPlace(BlockPlaceEvent e) {
 		if(!e.isCancelled()) {
-			if(PlayerHandler.isPlaying(e.getPlayer())) {
-				placedBlocks.add(e.getBlock().getLocation());
-				e.getItemInHand().setAmount(64);
+			Block against = e.getBlockAgainst();
+			if(against.getType() == Material.REDSTONE_BLOCK) {
+				e.setCancelled(true);
+			} else {
+				if(PlayerHandler.isPlaying(e.getPlayer())) {
+					placedBlocks.put(e.getPlayer(), e.getBlock().getLocation());
+					e.getItemInHand().setAmount(64);
+				}
 			}
 		}
 	}
@@ -89,13 +105,17 @@ public class ModeDangerBuilder extends Mode implements Listener {
 	@EventHandler(priority = EventPriority.HIGH)
 	public void blockBreak(BlockBreakEvent e) {
 		if(!e.isCancelled()) {
-			if(!placedBlocks.contains(e.getBlock().getLocation())) {
-				e.setCancelled(true);
-				return;
+			boolean toCancel = true;
+			for(Player currentPlayer : placedBlocks.keySet()) {
+				List<Location> blocksPlacedByPlayer = placedBlocks.get(currentPlayer);
+				if(!blocksPlacedByPlayer.isEmpty()) {
+					if(blocksPlacedByPlayer.contains(e.getBlock().getLocation())) {
+						toCancel = false;
+						blocksPlacedByPlayer.remove(e.getBlock().getLocation());
+					}
+				}
 			}
-			if(PlayerHandler.isPlaying(e.getPlayer())) {
-				placedBlocks.remove(e.getBlock().getLocation());
-			}
+			if(toCancel) e.setCancelled(true);
 		}
 	}
 

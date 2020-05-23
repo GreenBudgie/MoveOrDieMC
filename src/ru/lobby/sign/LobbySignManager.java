@@ -23,7 +23,8 @@ public class LobbySignManager implements Listener {
 	public static void init() {
 		Bukkit.getPluginManager().registerEvents(new LobbySignManager(), Plugin.INSTANCE);
 		SignStart start = new SignStart(7, 11, -4);
-		signs.addAll(Lists.newArrayList(start));
+		SignPoints points = new SignPoints(6, 11, -4);
+		signs.addAll(Lists.newArrayList(start, points));
 		updateSigns();
 	}
 

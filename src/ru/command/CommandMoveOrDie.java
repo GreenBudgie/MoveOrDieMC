@@ -25,6 +25,28 @@ public class CommandMoveOrDie implements CommandExecutor, TabCompleter {
 		if(!sender.isOp()) return true;
 		Player player = (Player) sender;
 		if(args.length > 0) {
+			if(args.length > 1 && args[0].equalsIgnoreCase("points")) {
+				try {
+					int score = Integer.parseInt(args[1]);
+					MDPlayer md = MDPlayer.fromPlayer(player);
+					if(md != null) md.setPoints(score);
+				} catch(Exception e) {
+					player.sendMessage(ChatColor.RED + "Invalid value");
+				}
+			}
+			if(args.length > 1 && args[0].equalsIgnoreCase("score")) {
+				try {
+					int score = Integer.parseInt(args[1]);
+					MDPlayer md = MDPlayer.fromPlayer(player);
+					if(md != null) md.setScore(score);
+				} catch(Exception e) {
+					player.sendMessage(ChatColor.RED + "Invalid value");
+				}
+			}
+			if(args[0].equalsIgnoreCase("damage")) {
+				MoveOrDie.DO_MOVE_DAMAGE = !MoveOrDie.DO_MOVE_DAMAGE;
+				player.sendMessage(ChatColor.GRAY + "Урон: " + MoveOrDie.DO_MOVE_DAMAGE);
+			}
 			if(args[0].equalsIgnoreCase("start")) {
 				if(args.length > 1) {
 					if(args[1].equalsIgnoreCase("mutator")) GameSetupManager.FAST_START = 1;
@@ -62,6 +84,9 @@ public class CommandMoveOrDie implements CommandExecutor, TabCompleter {
 						player.sendMessage(ChatColor.RED + "Incorrect mode");
 					}
 				}
+				if(args.length >= 2 && args[1].equalsIgnoreCase("sudden_death")) {
+					ModeManager.initSuddenDeath();
+				}
 				if(args.length >= 2 && args[1].equalsIgnoreCase("end")) {
 					ModeManager.endRound();
 				}
@@ -73,10 +98,10 @@ public class CommandMoveOrDie implements CommandExecutor, TabCompleter {
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
 		if(args.length == 1) {
-			return getMatchingStrings(args, "start", "end", "mainworld", "parkour_reset", "effects", "mode");
+			return getMatchingStrings(args, "start", "end", "mainworld", "parkour_reset", "effects", "mode", "damage", "score", "points");
 		}
 		if(args.length == 2 && args[0].equalsIgnoreCase("mode")) {
-			return getMatchingStrings(args, "switch", "end");
+			return getMatchingStrings(args, "switch", "sudden_death", "end");
 		}
 		if(args.length == 3 && args[0].equalsIgnoreCase("mode") && args[1].equalsIgnoreCase("switch")) {
 			return getMatchingStrings(args, ModeManager.getModes().stream().map(Mode::getID).collect(Collectors.toList()));

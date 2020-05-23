@@ -3,6 +3,7 @@ package ru.map;
 import com.google.common.collect.Lists;
 import org.bukkit.Location;
 import ru.game.WorldManager;
+import ru.util.Region;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +12,7 @@ public class MapFinale {
 
 	private static List<Location> spawns = new ArrayList<>();
 	private static Location winnerSpawn = new Location(null, 10, 13, 82);
+	private static Region floor = new Region(new Location(null, 2, 10, 82), new Location(null, 17, 10, 89));
 
 	static {
 		spawns.add(new Location(null, 4, 11, 85));
@@ -31,4 +33,11 @@ public class MapFinale {
 		list.forEach(location -> location.setWorld(WorldManager.getCurrentGameWorld()));
 		return list;
 	}
+
+	public static Region getFloor() {
+		Region clone = new Region(floor);
+		clone.setWorld(WorldManager.getCurrentGameWorld());
+		return clone;
+	}
+
 }

@@ -28,7 +28,7 @@ public class PlayerHandler implements Listener {
 	//Handles player's deaths queue. It uses a list inside so that to handle simultaneous deaths
 	private static List<Set<MDPlayer>> deathQueue = new ArrayList<>();
 	//Draw handling
-	private static final int maxDeathHandleDelay = 2;
+	private static final int maxDeathHandleDelay = 5;
 	private static int deathHandleDelay = -1;
 	private static Set<MDPlayer> lastDeaths = new HashSet<>();
 
@@ -91,7 +91,7 @@ public class PlayerHandler implements Listener {
 
 	public static void handleDeathResult() {
 		if(GameState.GAME.isRunning()) {
-			deathQueue.add(lastDeaths);
+			deathQueue.add(Sets.newHashSet(lastDeaths));
 			if(getAlive().size() <= 1) {
 				ModeManager.endRound();
 			}

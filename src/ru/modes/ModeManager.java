@@ -1,5 +1,6 @@
 package ru.modes;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
@@ -11,7 +12,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
-import ru.game.*;
+import ru.game.GameState;
+import ru.game.MDPlayer;
+import ru.game.MoveOrDie;
+import ru.game.PlayerHandler;
 import ru.mutator.Mutator;
 import ru.mutator.MutatorManager;
 import ru.mutator.MutatorSelector;
@@ -20,15 +24,14 @@ import ru.util.MathUtils;
 import ru.util.TaskManager;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class ModeManager implements Listener {
 
 	private static Mode activeMode = null;
 	private static Set<Mode> availableModes;
 	private static List<Mode> modes = new ArrayList<>();
+	private static boolean suddenDeath = false;
 	public static ModeFight FIGHT = new ModeFight();
 	public static ModeSpleef SPLEEF = new ModeSpleef();
 	public static ModeDangerBuilder DANGER_BUILDER = new ModeDangerBuilder();
@@ -50,7 +53,12 @@ public class ModeManager implements Listener {
 			activeMode.update();
 		}
 		if(TaskManager.isSecUpdated() && GameState.updateTimer()) {
-			endRound();
+			if(activeMode.allowSuddenDeath()) {
+				initSuddenDeath();
+				GameState.disableTimer();
+			} else {
+				endRound();
+			}
 		}
 	}
 
@@ -60,9 +68,24 @@ public class ModeManager implements Listener {
 
 	public static void cleanup() {
 		availableModes.clear();
+		suddenDeath = false;
 		if(activeMode != null) {
 			if(activeMode instanceof Listener) {
 				HandlerList.unregisterAll((Listener) activeMode);
+			}
+		}
+	}
+
+	public static boolean isSuddenDeath() {
+		return suddenDeath;
+	}
+
+	public static void initSuddenDeath() {
+		if(!suddenDeath) {
+			suddenDeath = true;
+			for(Player player : PlayerHandler.getPlayers()) {
+				player.sendTitle("", ChatColor.DARK_RED + "" + ChatColor.BOLD + "Внезапная смерть!", 5, 30, 5);
+				player.playSound(player.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, 1F, 1F);
 			}
 		}
 	}
@@ -118,41 +141,65 @@ public class ModeManager implements Listener {
 		GameState.GAME.set();
 	}
 
-	private static void addScore(Set<MDPlayer> players, int score) {
-		for(MDPlayer player : players) {
-			player.addScore(score);
-			ScoreboardHandler.setAddedScore(player, score);
-		}
-	}
-
 	public static void endRound() {
 		if(MutatorManager.getActiveMutator() != null) {
 			MutatorManager.getActiveMutator().onRoundPreEnd();
 		}
 		activeMode.end();
-		//FIXME Выдает не те очки, иногда выдает 0))))
-		boolean hasAlive = !PlayerHandler.getAlive().isEmpty();
-		List<Set<MDPlayer>> deathQueue = PlayerHandler.getDeathQueue();
-		if(hasAlive) { //If some players are still alive, we need to add them to death queue so as to give them enough points
-			deathQueue.add(Sets.newHashSet(PlayerHandler.getAlive()));
-		}
-		//Winners
-		addScore(deathQueue.get(deathQueue.size() - 1), MoveOrDie.getWinnerScore());
-		//Second place
-		if(deathQueue.size() >= 2) {
-			addScore(deathQueue.get(deathQueue.size() - 2), MoveOrDie.getSecondScore());
-		}
-		//Losers
-		if(deathQueue.size() >= 3) {
-			for(int i = 3; i <= deathQueue.size(); i++) {
-				addScore(deathQueue.get(deathQueue.size() - i), MoveOrDie.getLoserScore());
+		suddenDeath = false;
+
+		List<MDPlayer> alive = PlayerHandler.getAlive();
+		boolean draw = alive.size() != 1;
+		List<Set<MDPlayer>> winQueue = Lists.newArrayList(PlayerHandler.getDeathQueue());
+		if(!alive.isEmpty()) { //If some players are still alive, we need to add them to win queue so as to give them enough points
+			if(activeMode.usePoints()) {
+				//Adding winners by points from LESS points to MOST (because afterwards the list will be reversed)
+				alive.sort(Comparator.comparingInt(MDPlayer::getPoints));
+				Set<MDPlayer> currentPointsSet = new HashSet<>();
+				int currentPoints = -1;
+				for(MDPlayer currentPlayer : alive) {
+					if(currentPlayer.getPoints() > currentPoints) {
+						//Adding new players to win queue
+						if(!currentPointsSet.isEmpty()) winQueue.add(Sets.newHashSet(currentPointsSet));
+						currentPointsSet.clear();
+						currentPoints = currentPlayer.getPoints();
+						currentPointsSet.add(currentPlayer);
+					} else {
+						currentPointsSet.add(currentPlayer);
+					}
+				}
+				winQueue.add(Sets.newHashSet(currentPointsSet));
+			} else {
+				winQueue.add(Sets.newHashSet(PlayerHandler.getAlive()));
 			}
 		}
+		Collections.reverse(winQueue); //Now the winner is on 0 place
 		Broadcaster br = Broadcaster.each(PlayerHandler.getPlayers());
-		if(!hasAlive) {
-			br.title(ChatColor.RED + "" + ChatColor.BOLD + "Ничья", ChatColor.GRAY + "Никто не победил", 5, 60, 10);
+		br.toChat(ChatColor.GRAY + "-- " + ChatColor.DARK_AQUA + ChatColor.BOLD + "Результаты" + ChatColor.RESET + ChatColor.GRAY + " --");
+		for(int i = 0; i < winQueue.size(); i++) {
+			Set<MDPlayer> placePlayers = winQueue.get(i);
+			int score = MoveOrDie.getScoreForPlace(i + 1);
+			for(MDPlayer player : placePlayers) {
+				player.addScore(score, !draw);
+			}
+			StringBuilder builder = new StringBuilder();
+			for(MDPlayer currentPlayer : placePlayers) {
+				builder.append(currentPlayer.getColor());
+				builder.append(currentPlayer.getNickname());
+				builder.append(ChatColor.GRAY);
+				builder.append(", ");
+			}
+			String info = builder.toString().substring(0, builder.length() - 2);
+			String points = activeMode.usePoints() && !placePlayers.iterator().next().isGhost() ?
+					ChatColor.GRAY + " <" + ChatColor.DARK_AQUA + "" + placePlayers.iterator().next().getPoints() + ChatColor.GRAY + ">" :
+					"";
+			br.toChat(ChatColor.DARK_GREEN + " #" + ChatColor.GREEN + (i + 1) + " " + info + points + ChatColor.DARK_GRAY + " (" + ChatColor.DARK_GREEN + "+" + score
+					+ ChatColor.DARK_GRAY + ")");
+		}
+		if(draw) {
+			br.title(ChatColor.RED + "" + ChatColor.BOLD + "Ничья", ChatColor.GRAY + "Нет победителя", 5, 60, 10);
 		} else {
-			MDPlayer winner = deathQueue.get(deathQueue.size() - 1).iterator().next();
+			MDPlayer winner = winQueue.get(0).iterator().next();
 			br.title(winner.getColor() + winner.getNickname(), ChatColor.GREEN + "Победил", 5, 60, 10);
 		}
 		MoveOrDie.increaseRounds();

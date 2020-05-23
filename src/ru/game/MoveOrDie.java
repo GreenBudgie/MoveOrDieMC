@@ -30,12 +30,12 @@ import java.util.Set;
 
 public class MoveOrDie implements Listener {
 
-	public static final boolean TEST = true; //FIXME Remove on release
+	public static boolean DO_MOVE_DAMAGE = true;
 	public static final int MAX_PLAYERS = 6;
 	private static final Set<ChatColor> availableColors = Sets
 			.newHashSet(ChatColor.RED, ChatColor.GREEN, ChatColor.YELLOW, ChatColor.AQUA, ChatColor.LIGHT_PURPLE, ChatColor.GOLD);
 	private static int roundsPassed = 0, roundsToSelectNewMutator = 6;
-	private static int scoreToWin = 25; //TODO
+	private static int scoreToWin = 50;
 
 	public static void init() {
 		Bukkit.getPluginManager().registerEvents(new MoveOrDie(), Plugin.INSTANCE);
@@ -101,7 +101,6 @@ public class MoveOrDie implements Listener {
 			ScoreboardHandler.updateScoreboardTeams();
 			ModeManager.cleanup();
 			MutatorSelector.cleanup();
-			ScoreboardHandler.cleanup();
 			WorldManager.deleteWorld();
 		}
 	}
@@ -176,20 +175,21 @@ public class MoveOrDie implements Listener {
 		roundsPassed++;
 	}
 
+	public static void cycleScoreToWin() {
+		scoreToWin += 25;
+		if(scoreToWin > 100) {
+			scoreToWin = 25;
+		}
+	}
+
 	public static int getScoreToWin() {
 		return scoreToWin;
 	}
 
-	public static int getWinnerScore() {
-		return PlayerHandler.getMDPlayers().size() + 2;
-	}
-
-	public static int getSecondScore() {
-		return (int) Math.ceil(getWinnerScore() / 2.5);
-	}
-
-	public static int getLoserScore() {
-		return (int) Math.ceil(getWinnerScore() / 4.0);
+	public static int getScoreForPlace(int place) {
+		if(place == 1) return 5;
+		if(place == 2) return 2;
+		return 1;
 	}
 
 	public static Set<ChatColor> getAvailableColors() {

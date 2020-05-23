@@ -14,7 +14,6 @@ import java.util.*;
 public class ScoreboardHandler {
 
 	private static Scoreboard lobbyScoreboard;
-	private static Map<MDPlayer, Integer> addedScore = new HashMap<>();
 
 	public static void createGameScoreboard(Player player) {
 		Scoreboard gameScoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
@@ -57,14 +56,6 @@ public class ScoreboardHandler {
 		}
 	}
 
-	public static void setAddedScore(MDPlayer player, int score) {
-		addedScore.put(player, score);
-	}
-
-	public static void cleanup() {
-		addedScore.clear();
-	}
-
 	public static void updateGameScoreboard(Player player) {
 		MDPlayer mdPlayer = MDPlayer.fromPlayer(player);
 		Scoreboard board = player.getScoreboard();
@@ -78,13 +69,17 @@ public class ScoreboardHandler {
 		for(MDPlayer currentPlayer : sortedPlayers) {
 			String bold = currentPlayer == mdPlayer ? ChatColor.BOLD + "" : "";
 			String dead = currentPlayer.isGhost() && GameState.GAME.isRunning() ? ChatColor.STRIKETHROUGH + "" : "";
-			String scoreInfo = GameState.ROUND_END.isRunning() ? ChatColor.DARK_GREEN + " +" + addedScore.getOrDefault(currentPlayer, 0) : "";
+			ChatColor pointsColor = MoveOrDie.getScoreToWin() - currentPlayer.getScore() <= MoveOrDie.getScoreForPlace(1) ? ChatColor.DARK_RED : ChatColor.GOLD;
+			String points = "";
+			if(GameState.isInGame() && ModeManager.getActiveMode().usePoints() && !currentPlayer.isGhost()) {
+				points = ChatColor.DARK_AQUA + "" + currentPlayer.getPoints() + ChatColor.DARK_GRAY + " | ";
+			}
 			Score score = gameInfo.getScore(
-					currentPlayer.getColor() + bold + dead + currentPlayer.getNickname() + ChatColor.RESET + ChatColor.GRAY + " - " + ChatColor.GOLD + ChatColor.BOLD
-							+ currentPlayer.getScore() + scoreInfo);
+					points + currentPlayer.getColor() + bold + dead + currentPlayer.getNickname() + ChatColor.RESET + ChatColor.GRAY + " - " + pointsColor + ChatColor.BOLD
+							+ currentPlayer.getScore());
 			score.setScore(c++);
 		}
-		Score splitter = gameInfo.getScore(ChatColor.GRAY + " - ");
+		Score splitter = gameInfo.getScore(ChatColor.GRAY + "> " + ChatColor.DARK_AQUA + "Игра до: " + ChatColor.AQUA + ChatColor.BOLD + MoveOrDie.getScoreToWin() + ChatColor.RESET + ChatColor.GRAY + " <");
 		splitter.setScore(c++);
 		if(GameState.isInGame()) {
 			if(MutatorManager.getActiveMutator() != null) {
@@ -92,7 +87,12 @@ public class ScoreboardHandler {
 						ChatColor.YELLOW + "Мутатор" + ChatColor.GRAY + ": " + ChatColor.DARK_RED + ChatColor.BOLD + MutatorManager.getActiveMutator().getName());
 				mutator.setScore(c++);
 			}
-			String timer = ModeManager.getActiveMode().hasTime() && GameState.GAME.isRunning() ? ChatColor.AQUA + " " + GameState.getTimer() : "";
+			String timer;
+			if(ModeManager.isSuddenDeath()){
+				timer = ChatColor.DARK_RED + "" + ChatColor.BOLD + " \u274C";
+			} else {
+				timer = ModeManager.getActiveMode().hasTime() && GameState.GAME.isRunning() ? ChatColor.AQUA + " " + GameState.getTimer() : "";
+			}
 			Score mode = gameInfo.getScore(
 					ChatColor.GREEN + "Режим" + ChatColor.GRAY + ": " + ModeManager.getActiveMode().getColoredName() + timer);
 			mode.setScore(c++);

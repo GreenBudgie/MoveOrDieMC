@@ -55,8 +55,13 @@ public class ModeSpleef extends Mode {
 	}
 
 	@Override
+	public boolean usePoints() {
+		return false;
+	}
+
+	@Override
 	public int getTime() {
-		return 45;
+		return 30;
 	}
 
 	@Override
