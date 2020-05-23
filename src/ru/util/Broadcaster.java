@@ -25,7 +25,7 @@ public class Broadcaster {
 	private Set<Player> players;
 
 	public static void info(Object msg) {
-		Bukkit.broadcastMessage(msg.toString());
+		Bukkit.broadcastMessage(msg == null ? "null" : msg.toString());
 	}
 
 	public static Broadcaster everybody() {

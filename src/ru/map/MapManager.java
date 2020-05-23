@@ -4,6 +4,7 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import ru.blocks.CustomBlockTeleporter;
 import ru.game.MoveOrDie;
 import ru.game.WorldManager;
 import ru.modes.Mode;
@@ -14,10 +15,7 @@ import ru.util.Region;
 import ru.util.WorldUtils;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class MapManager {
@@ -27,6 +25,7 @@ public class MapManager {
 	private static YamlConfiguration mapsConfig = YamlConfiguration.loadConfiguration(mapsFile);
 	private static Set<GameMap> usedMaps = new HashSet<>();
 
+	@SuppressWarnings (value="unchecked")
 	public static void init() {
 		for(String key : mapsConfig.getKeys(false)) {
 			ConfigurationSection section = mapsConfig.getConfigurationSection(key);
@@ -41,6 +40,21 @@ public class MapManager {
 					Mode mode = ModeManager.getByID(modeID);
 					if(mode == null) throw new RuntimeException("Invalid mode ID");
 					modes.add(ModeManager.getByID(modeID));
+				}
+				if(section.contains("teleporters")) {
+					try {
+						List<?> list = section.getList("teleporters");
+						if(list != null) {
+							for(Object teleporter : list) {
+								List<String> linked = (List<String>) teleporter;
+								Location l1 = WorldUtils.getLocationFromString(linked.get(0));
+								Location l2 = WorldUtils.getLocationFromString(linked.get(1));
+								CustomBlockTeleporter.linkTeleporters(l1, l2);
+							}
+						} else throw new RuntimeException("Invalid teleporters declaration");
+					} catch(Exception e) {
+						throw new RuntimeException("Invalid teleporters declaration");
+					}
 				}
 				if(modes.isEmpty()) throw new RuntimeException("A map cannot support no modes");
 				Region region = Region.deserialize(section.getConfigurationSection("region").getValues(false));

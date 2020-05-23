@@ -19,12 +19,12 @@ public class CustomBlockManager {
 	public static final CustomBlockSpringboard SPRINGBOARD = new CustomBlockSpringboard();
 	public static final CustomBlockDeath DEATH = new CustomBlockDeath();
 	public static final CustomBlockGlass GLASS = new CustomBlockGlass();
+	public static final CustomBlockTeleporter TELEPOTER = new CustomBlockTeleporter();
 
 	public static void update() {
 		customBlocks.forEach(CustomBlock::update);
 		for(Player player : Bukkit.getOnlinePlayers()) {
 			if(player.getGameMode() == GameMode.SPECTATOR) continue;
-			A:
 			for(CustomBlock customBlock : customBlocks) {
 				BoundingBox box = player.getBoundingBox();
 				box.expand(0.1);

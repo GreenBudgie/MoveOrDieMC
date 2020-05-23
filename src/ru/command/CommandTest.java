@@ -11,7 +11,11 @@ import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
+import ru.blocks.CustomBlockTeleporter;
 import ru.map.MapManager;
+import ru.util.Broadcaster;
+import ru.util.MathUtils;
 import ru.util.ParticleUtils;
 
 public class CommandTest implements CommandExecutor {
@@ -19,7 +23,7 @@ public class CommandTest implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if(!sender.isOp()) return true;
 		Player p = (Player) sender;
-		p.sendMessage(ChatColor.DARK_RED + "" + ChatColor.BOLD + "\u2718 \u2717 \u274C");
+		Broadcaster.info(CustomBlockTeleporter.links);
 		return true;
 	}
 
