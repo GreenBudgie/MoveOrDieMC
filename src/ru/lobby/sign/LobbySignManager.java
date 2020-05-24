@@ -24,7 +24,8 @@ public class LobbySignManager implements Listener {
 		Bukkit.getPluginManager().registerEvents(new LobbySignManager(), Plugin.INSTANCE);
 		SignStart start = new SignStart(7, 11, -4);
 		SignPoints points = new SignPoints(6, 11, -4);
-		signs.addAll(Lists.newArrayList(start, points));
+		SignHP hp = new SignHP(7, 12, -4);
+		signs.addAll(Lists.newArrayList(start, points, hp));
 		updateSigns();
 	}
 

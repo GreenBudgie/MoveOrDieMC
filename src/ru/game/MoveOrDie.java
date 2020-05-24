@@ -17,6 +17,7 @@ import ru.lobby.LobbyParkourHandler;
 import ru.lobby.sign.LobbySignManager;
 import ru.map.MapManager;
 import ru.modes.ModeManager;
+import ru.mutator.Mutator;
 import ru.mutator.MutatorManager;
 import ru.mutator.MutatorSelector;
 import ru.start.Plugin;
@@ -147,9 +148,10 @@ public class MoveOrDie implements Listener {
 					GameFinaleManager.start(winner);
 				} else {
 					ModeManager.getActiveMode().onRoundEnd();
-					if(roundsPassed % roundsToSelectNewMutator == 0) {
+					if(roundsPassed % roundsToSelectNewMutator == 0 || MutatorManager.FORCE_SELECTOR) {
 						MutatorManager.deactivateMutator();
 						MutatorSelector.start();
+						MutatorManager.FORCE_SELECTOR = false;
 					} else {
 						if(MutatorManager.getActiveMutator() != null) {
 							MutatorManager.getActiveMutator().onRoundEnd();

@@ -9,6 +9,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import ru.modes.ModeManager;
+import ru.mutator.Mutator;
+import ru.mutator.MutatorManager;
 import ru.util.*;
 
 import javax.annotation.Nullable;
@@ -18,6 +20,7 @@ import javax.annotation.Nullable;
  */
 public class MDPlayer {
 
+	private final double ghostRadius = 1.5;
 	private final int maxMoveHP = 160;
 	private String nickname;
 	private Player player;
@@ -32,9 +35,11 @@ public class MDPlayer {
 		this.player = player;
 		this.nickname = player.getName();
 		moveBar = Bukkit.createBossBar(MoveOrDie.getLogo(), BarColor.GREEN, BarStyle.SOLID);
-		moveBar.setProgress(1);
-		moveBar.addPlayer(player);
-		moveBar.setVisible(true);
+		if(PlayerHandler.getHPDisplay(player) != PlayerHandler.HPDisplay.ACTIONBAR) {
+			moveBar.setProgress(1);
+			moveBar.addPlayer(player);
+			moveBar.setVisible(true);
+		}
 	}
 
 	/**
@@ -103,18 +108,19 @@ public class MDPlayer {
 	}
 
 	public void handleSprintHp() {
-		if(!ModeManager.isSuddenDeath()) {
+		if(!ModeManager.isSuddenDeath() && !MutatorManager.FLY_OR_DIE.isActive()) {
 			moveHP = MathUtils.clamp(moveHP + 8, 0, maxMoveHP);
 		}
 	}
 
 	public void handleWalkHp() {
-		if(!ModeManager.isSuddenDeath()) {
+		if(!ModeManager.isSuddenDeath() && !MutatorManager.FLY_OR_DIE.isActive()) {
 			moveHP = MathUtils.clamp(moveHP + 5, 0, maxMoveHP);
 		}
 	}
 
 	private void updateActionBar() {
+		if(PlayerHandler.getHPDisplay(player) == PlayerHandler.HPDisplay.BOSSBAR) return;
 		String symbol = "\u2764";
 		final int toShow = 20;
 		if(GameState.isInGame()) {
@@ -161,13 +167,43 @@ public class MDPlayer {
 			moveHP = maxMoveHP;
 		} else {
 			if(GameState.GAME.isRunning()) {
+				boolean closeToGhost = false;
+				for(MDPlayer mdPlayer : PlayerHandler.getMDPlayers()) {
+					if(mdPlayer != this && mdPlayer.isGhost) {
+						double distSq = mdPlayer.player.getLocation().distanceSquared(this.player.getLocation());
+						if(distSq < ghostRadius * ghostRadius) {
+							closeToGhost = true;
+							break;
+						}
+					}
+				}
+				if(closeToGhost) {
+					if(MutatorManager.DEATH_TOUCH.isActive() && MoveOrDie.DO_MOVE_DAMAGE) {
+						moveHP -= 6;
+					} else {
+						player.setWalkSpeed(0.08F);
+						player.removePotionEffect(PotionEffectType.JUMP);
+						player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 1, false, false));
+					}
+				} else {
+					player.setWalkSpeed(0.2F);
+					if(!MutatorManager.JUMP_BOOST.isActive()) {
+						player.removePotionEffect(PotionEffectType.JUMP);
+						player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 3, false, false));
+					}
+				}
 				if(moveHP > 0) {
 					if(MoveOrDie.DO_MOVE_DAMAGE) {
+						if(MutatorManager.FLY_OR_DIE.isActive()) {
+							if(!player.isOnGround()) {
+								moveHP = MathUtils.clamp(moveHP + 6, 0, maxMoveHP);
+							}
+						}
 						if(!ModeManager.isSuddenDeath()) {
 							if(player.isOnGround()) {
 								moveHP -= 4;
 							} else {
-								moveHP -= 2;
+								if(!MutatorManager.FLY_OR_DIE.isActive()) moveHP -= 2;
 							}
 						} else {
 							moveHP -= 1;

@@ -1,10 +1,10 @@
 package ru.mutator;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import ru.game.MDPlayer;
 import ru.game.PlayerHandler;
 
 public class MutatorJumpBoost extends Mutator {
@@ -22,6 +22,19 @@ public class MutatorJumpBoost extends Mutator {
 	@Override
 	public String getDescription() {
 		return "Прыжки становятся дико высокими";
+	}
+
+	@Override
+	public void update() {
+		for(MDPlayer player : PlayerHandler.getMDPlayers()) {
+			PotionEffect jump = player.getPlayer().getPotionEffect(PotionEffectType.JUMP);
+			if(jump != null) {
+				if(jump.getAmplifier() < 5) {
+					player.getPlayer().removePotionEffect(PotionEffectType.JUMP);
+					player.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 5, false, false));
+				}
+			}
+		}
 	}
 
 	@Override

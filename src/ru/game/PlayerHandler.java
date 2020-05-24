@@ -16,10 +16,7 @@ import ru.util.Broadcaster;
 import ru.util.EntityUtils;
 import ru.util.WorldUtils;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class PlayerHandler implements Listener {
@@ -31,6 +28,37 @@ public class PlayerHandler implements Listener {
 	private static final int maxDeathHandleDelay = 5;
 	private static int deathHandleDelay = -1;
 	private static Set<MDPlayer> lastDeaths = new HashSet<>();
+
+	private static Map<String, HPDisplay> hpDisplay = new HashMap<>();
+
+	public enum HPDisplay {
+		ACTIONBAR("Над инвентарем"), BOSSBAR("Сверху экрана"), BOTH("Сверху и над инвентарем");
+
+		public String name;
+
+		HPDisplay(String name) {
+			this.name = name;
+		}
+	}
+
+	public static HPDisplay getHPDisplay(Player player) {
+		return hpDisplay.getOrDefault(player.getName(), HPDisplay.ACTIONBAR);
+	}
+
+	public static void setHpDisplay(Player player, HPDisplay display) {
+		hpDisplay.getOrDefault(player.getName(), display);
+	}
+
+	public static void cycleHPDisplay(Player player) {
+		HPDisplay prev = getHPDisplay(player);
+		for(int i = 0; i < HPDisplay.values().length; i++) {
+			HPDisplay current = HPDisplay.values()[i];
+			if(prev == current) {
+				hpDisplay.put(player.getName(), HPDisplay.values()[i == HPDisplay.values().length - 1 ? 0 : i + 1]);
+				break;
+			}
+		}
+	}
 
 	public static List<Player> getPlayers() {
 		return players.stream().map(MDPlayer::getPlayer).collect(Collectors.toList());

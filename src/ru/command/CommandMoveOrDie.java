@@ -14,12 +14,31 @@ import ru.lobby.LobbyParkour;
 import ru.lobby.LobbyParkourHandler;
 import ru.modes.Mode;
 import ru.modes.ModeManager;
+import ru.mutator.Mutator;
+import ru.mutator.MutatorManager;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class CommandMoveOrDie implements CommandExecutor, TabCompleter {
+
+	private static List<String> getMatchingStrings(String[] args, String... possibilities) {
+		return getMatchingStrings(args, Arrays.asList(possibilities));
+	}
+
+	private static List<String> getMatchingStrings(String[] inputArgs, List<String> possibleCompletions) {
+		String arg = inputArgs[inputArgs.length - 1];
+		List<String> list = Lists.newArrayList();
+		if(!possibleCompletions.isEmpty()) {
+			for(String completion : possibleCompletions) {
+				if(completion.startsWith(arg)) {
+					list.add(completion);
+				}
+			}
+		}
+		return list;
+	}
 
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if(!sender.isOp()) return true;
@@ -74,6 +93,24 @@ public class CommandMoveOrDie implements CommandExecutor, TabCompleter {
 			if(args[0].equalsIgnoreCase("effects")) {
 				PlayerHandler.givePlayerEffects(player);
 			}
+			if(args.length > 1 && args[0].equalsIgnoreCase("mutator")) {
+				if(args.length > 2 && args[1].equalsIgnoreCase("force")) {
+					Mutator mutator = MutatorManager.getMutators().stream().filter(m -> m.getName().replaceAll(" ", "").equalsIgnoreCase(args[2])).findFirst()
+							.orElse(null);
+					if(mutator != null) {
+						player.sendMessage(ChatColor.GREEN + "В след. раунде будет выбран мутатор: " + mutator.getName());
+						MutatorManager.FORCED_MUTATOR = mutator;
+					} else {
+						player.sendMessage(ChatColor.RED + "Invalid mutator name");
+					}
+				}
+				if(args[1].equalsIgnoreCase("disable")) {
+					MutatorManager.FORCE_DISABLE = true;
+				}
+				if(args[1].equalsIgnoreCase("selector")) {
+					MutatorManager.FORCE_SELECTOR = true;
+				}
+			}
 			if(GameState.isPlaying() && args[0].equalsIgnoreCase("mode")) {
 				if(args.length >= 3 && args[1].equalsIgnoreCase("switch")) {
 					Mode toSwitch = ModeManager.getByID(args[2]);
@@ -98,10 +135,17 @@ public class CommandMoveOrDie implements CommandExecutor, TabCompleter {
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
 		if(args.length == 1) {
-			return getMatchingStrings(args, "start", "end", "mainworld", "parkour_reset", "effects", "mode", "damage", "score", "points");
+			return getMatchingStrings(args, "start", "end", "mainworld", "parkour_reset", "effects", "mode", "damage", "score", "points", "mutator");
+		}
+		if(args.length == 2 && args[0].equalsIgnoreCase("mutator")) {
+			return getMatchingStrings(args, "force", "selector", "disable");
 		}
 		if(args.length == 2 && args[0].equalsIgnoreCase("mode")) {
 			return getMatchingStrings(args, "switch", "sudden_death", "end");
+		}
+		if(args.length == 3 && args[0].equalsIgnoreCase("mutator") && args[1].equalsIgnoreCase("force")) {
+			return getMatchingStrings(args,
+					MutatorManager.getMutators().stream().map(mutator -> mutator.getName().replaceAll(" ", "")).collect(Collectors.toList()));
 		}
 		if(args.length == 3 && args[0].equalsIgnoreCase("mode") && args[1].equalsIgnoreCase("switch")) {
 			return getMatchingStrings(args, ModeManager.getModes().stream().map(Mode::getID).collect(Collectors.toList()));
@@ -110,23 +154,6 @@ public class CommandMoveOrDie implements CommandExecutor, TabCompleter {
 			return getMatchingStrings(args, "mutator", "game");
 		}
 		return null;
-	}
-
-	private static List<String> getMatchingStrings(String[] args, String... possibilities) {
-		return getMatchingStrings(args, Arrays.asList(possibilities));
-	}
-
-	private static List<String> getMatchingStrings(String[] inputArgs, List<String> possibleCompletions) {
-		String arg = inputArgs[inputArgs.length - 1];
-		List<String> list = Lists.newArrayList();
-		if(!possibleCompletions.isEmpty()) {
-			for(String completion : possibleCompletions) {
-				if(completion.startsWith(arg)) {
-					list.add(completion);
-				}
-			}
-		}
-		return list;
 	}
 
 }

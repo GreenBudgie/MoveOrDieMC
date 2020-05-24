@@ -52,15 +52,15 @@ public class ModeFall extends Mode {
 	}
 
 	private void convert(Block block) {
-		ParticleUtils.createParticlesOutline(block, Particle.LAVA, null, 6);
+		ParticleUtils.createParticlesOutline(block, Particle.LAVA, null, 5);
 		block.getWorld().playSound(block.getLocation(), Sound.ITEM_FLINTANDSTEEL_USE, 1F, (float) MathUtils.randomRangeDouble(1.2, 1.6));
 		block.setType(DESTROY_TYPE);
-		delayToDestroy.put(block, 30);
+		delayToDestroy.put(block, 25);
 		blocks.remove(block);
 	}
 
 	private void destroy(Block block) {
-		ParticleUtils.createParticlesInside(block, Particle.SMOKE_NORMAL, null, 6);
+		ParticleUtils.createParticlesInside(block, Particle.SMOKE_LARGE, null, 5);
 		block.getWorld().playSound(block.getLocation(), Sound.ITEM_FIRECHARGE_USE, 1F, (float) MathUtils.randomRangeDouble(1.5, 1.8));
 		block.setType(Material.AIR);
 	}
@@ -81,13 +81,13 @@ public class ModeFall extends Mode {
 		if(!blocks.isEmpty()) {
 			delay--;
 			if(delay <= 0) {
-				int count = MathUtils.randomRange(2, 4);
+				int count = MathUtils.randomRange(2, 5);
 				count = Math.min(count, blocks.size());
 				for(int i = 0; i < count; i++) {
 					Block convertBlock = MathUtils.choose(blocks);
 					convert(convertBlock);
 				}
-				delay = MathUtils.randomRange(15, 25);
+				delay = MathUtils.randomRange(10, 20);
 			}
 		}
 	}

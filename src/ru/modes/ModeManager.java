@@ -113,6 +113,13 @@ public class ModeManager implements Listener {
 		}
 		activeMode.prepare();
 		Mutator mutator = MutatorSelector.getSelectedMutator();
+		if(MutatorManager.FORCED_MUTATOR != null) {
+			mutator = MutatorManager.FORCED_MUTATOR;
+			MutatorManager.FORCED_MUTATOR = null;
+		}
+		if(MutatorManager.FORCE_DISABLE) {
+			mutator = null;
+		}
 		if(mutator != null) {
 			if(MutatorManager.getActiveMutator() == null || mutator != MutatorManager.getActiveMutator()) {
 				mutator.setActive();

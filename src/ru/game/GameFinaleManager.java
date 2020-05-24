@@ -38,7 +38,7 @@ public class GameFinaleManager {
 			}
 			mdPlayer.getPlayer().playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1F, 1F);
 		}
-		GameState.setTimer(10);
+		GameState.setTimer(15);
 		GameState.FINALE.set();
 	}
 

@@ -7,11 +7,16 @@ import java.util.List;
 
 public class MutatorManager implements Listener {
 
+	public static Mutator FORCED_MUTATOR = null;
+	public static boolean FORCE_DISABLE = false;
+	public static boolean FORCE_SELECTOR = false;
 	protected static Mutator activeMutator = null;
 	private static List<Mutator> mutators = new ArrayList<>();
 	public static MutatorJumpBoost JUMP_BOOST = new MutatorJumpBoost();
 	public static MutatorHyperSpeed HYPER_SPEED = new MutatorHyperSpeed();
 	public static MutatorBombDrop BOMB_DROP = new MutatorBombDrop();
+	public static MutatorDeathTouch DEATH_TOUCH = new MutatorDeathTouch();
+	public static MutatorFlyOrDie FLY_OR_DIE = new MutatorFlyOrDie();
 
 	public static void update() {
 		if(activeMutator != null) {
