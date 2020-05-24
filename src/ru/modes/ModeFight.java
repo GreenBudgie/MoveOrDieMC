@@ -68,12 +68,37 @@ public class ModeFight extends Mode {
 
 	@Override
 	public int getTime() {
-		return 30;
+		return 45;
 	}
 
 	@Override
 	public boolean allowPVP() {
 		return true;
+	}
+
+	@Override
+	public boolean allowBlockBreaking() {
+		return false;
+	}
+
+	@Override
+	public boolean allowBlockPlacing() {
+		return false;
+	}
+
+	@Override
+	public boolean allowSuddenDeath() {
+		return true;
+	}
+
+	@Override
+	public boolean usePoints() {
+		return true;
+	}
+
+	@Override
+	public boolean useSurvivalGameMode() {
+		return false;
 	}
 
 }

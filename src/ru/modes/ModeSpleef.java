@@ -60,12 +60,32 @@ public class ModeSpleef extends Mode {
 	}
 
 	@Override
+	public boolean allowPVP() {
+		return false;
+	}
+
+	@Override
+	public boolean useSurvivalGameMode() {
+		return false;
+	}
+
+	@Override
 	public int getTime() {
 		return 30;
 	}
 
 	@Override
 	public boolean allowBlockBreaking() {
+		return true;
+	}
+
+	@Override
+	public boolean allowBlockPlacing() {
+		return false;
+	}
+
+	@Override
+	public boolean allowSuddenDeath() {
 		return true;
 	}
 

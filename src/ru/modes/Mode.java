@@ -14,6 +14,8 @@ import ru.start.Plugin;
 
 public abstract class Mode {
 
+	protected GameMap map;
+
 	public Mode() {
 		ModeManager.getModes().add(this);
 	}
@@ -22,9 +24,25 @@ public abstract class Mode {
 	public abstract String getDescription();
 	public abstract Material getItemToShow();
 	public abstract String getID();
+	public abstract boolean allowPVP();
+	public abstract boolean allowBlockBreaking();
+	public abstract boolean allowBlockPlacing();
+	/**
+	 * Determines whether to start sudden death after the round ends
+	 * @return Whether to allow sudden death
+	 */
+	public abstract boolean allowSuddenDeath();
+	/**
+	 * Whether to use point system in this mode Ex: in FIGHT it must count the number of kills by player. If 2 or more players survived it must give the winner
+	 * status to a player with the most points
+	 * @return Whether to use point system
+	 */
+	public abstract boolean usePoints();
+	public abstract boolean useSurvivalGameMode();
+	public abstract int getTime(); //-1 disables the timer
 
-	public int getTime() {
-		return -1; //-1 disables the timer
+	public final GameMap getMap() {
+		return map;
 	}
 
 	public final boolean hasTime() {
@@ -36,7 +54,7 @@ public abstract class Mode {
 
 	public final void prepare() {
 		WorldManager.getCurrentGameWorld().setPVP(false);
-		GameMap map = MapManager.useMapForMode(this);
+		map = MapManager.useMapForMode(this);
 		map.spreadPlayers();
 		for(Player player : PlayerHandler.getPlayers()) {
 			PlayerHandler.resetNoEffects(player);
@@ -87,39 +105,6 @@ public abstract class Mode {
 	}
 
 	public void onPlayerDeath(MDPlayer mdPlayer) {
-	}
-
-	/**
-	 * Determines whether to start sudden death after the round ends
-	 * @return Whether to allow sudden death
-	 */
-	public boolean allowSuddenDeath() {
-		return true;
-	}
-
-	/**
-	 * Whether to use point system in this mode
-	 * Ex: in FIGHT it must count the number of kills by player. If 2 or more players survived it must give the winner status to a player with the most points
-	 * @return Whether to use point system
-	 */
-	public boolean usePoints() {
-		return true;
-	}
-
-	public boolean useSurvivalGameMode() {
-		return false;
-	}
-
-	public boolean allowPVP() {
-		return false;
-	}
-
-	public boolean allowBlockBreaking() {
-		return false;
-	}
-
-	public boolean allowBlockPlacing() {
-		return false;
 	}
 
 	public final boolean isActive() {

@@ -35,6 +35,7 @@ public class ModeManager implements Listener {
 	public static ModeFight FIGHT = new ModeFight();
 	public static ModeSpleef SPLEEF = new ModeSpleef();
 	public static ModeDangerBuilder DANGER_BUILDER = new ModeDangerBuilder();
+	public static ModeFall FALL = new ModeFall();
 
 	public static List<Mode> getModes() {
 		return modes;

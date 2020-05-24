@@ -55,36 +55,17 @@ public class ModeDangerBuilder extends Mode implements Listener {
 		}
 	}
 
+	@Override
+	public void onRoundPreEnd() {
+		placedBlocks.clear();
+	}
+
 	@Nullable
 	public Player getWhoPlacedBlock(Block block) {
 		for(Player player : placedBlocks.keySet()) {
 			if(placedBlocks.get(player).contains(block.getLocation())) return player;
 		}
 		return null;
-	}
-
-	@Override
-	public int getTime() {
-		return 50;
-	}
-
-	@Override
-	public boolean allowBlockPlacing() {
-		return true;
-	}
-
-	@Override
-	public boolean allowBlockBreaking() {
-		return true;
-	}
-
-	public boolean useSurvivalGameMode() {
-		return true;
-	}
-
-	@Override
-	public void onRoundPreEnd() {
-		placedBlocks.clear();
 	}
 
 	@EventHandler(priority = EventPriority.HIGH)
@@ -117,6 +98,42 @@ public class ModeDangerBuilder extends Mode implements Listener {
 			}
 			if(toCancel) e.setCancelled(true);
 		}
+	}
+
+
+	@Override
+	public int getTime() {
+		return 50;
+	}
+
+	@Override
+	public boolean allowBlockPlacing() {
+		return true;
+	}
+
+	@Override
+	public boolean allowSuddenDeath() {
+		return true;
+	}
+
+	@Override
+	public boolean usePoints() {
+		return true;
+	}
+
+	@Override
+	public boolean allowBlockBreaking() {
+		return true;
+	}
+
+	@Override
+	public boolean useSurvivalGameMode() {
+		return true;
+	}
+
+	@Override
+	public boolean allowPVP() {
+		return false;
 	}
 
 }

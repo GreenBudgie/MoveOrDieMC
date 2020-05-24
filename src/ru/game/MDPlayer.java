@@ -170,7 +170,7 @@ public class MDPlayer {
 								moveHP -= 2;
 							}
 						} else {
-							moveHP -= 3;
+							moveHP -= 1;
 						}
 					}
 				} else {
