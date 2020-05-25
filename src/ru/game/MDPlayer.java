@@ -170,7 +170,7 @@ public class MDPlayer {
 				boolean closeToGhost = false;
 				for(MDPlayer mdPlayer : PlayerHandler.getMDPlayers()) {
 					if(mdPlayer != this && mdPlayer.isGhost) {
-						double distSq = mdPlayer.player.getLocation().distanceSquared(this.player.getLocation());
+						double distSq = EntityUtils.getEntityCenter(mdPlayer.player).distanceSquared(EntityUtils.getEntityCenter(player));
 						if(distSq < ghostRadius * ghostRadius) {
 							closeToGhost = true;
 							break;

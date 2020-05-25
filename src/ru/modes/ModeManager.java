@@ -36,6 +36,7 @@ public class ModeManager implements Listener {
 	public static ModeSpleef SPLEEF = new ModeSpleef();
 	public static ModeDangerBuilder DANGER_BUILDER = new ModeDangerBuilder();
 	public static ModeFall FALL = new ModeFall();
+	public static ModeBombTag BOMB_TAG = new ModeBombTag();
 
 	public static List<Mode> getModes() {
 		return modes;
@@ -71,6 +72,7 @@ public class ModeManager implements Listener {
 		availableModes.clear();
 		suddenDeath = false;
 		if(activeMode != null) {
+			activeMode.onRoundEnd();
 			if(activeMode instanceof Listener) {
 				HandlerList.unregisterAll((Listener) activeMode);
 			}

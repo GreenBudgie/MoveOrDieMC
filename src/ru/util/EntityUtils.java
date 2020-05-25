@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -19,6 +20,15 @@ public class EntityUtils {
 	 */
 	public static void clearPotionEffects(LivingEntity ent) {
 		ent.getActivePotionEffects().forEach(ef -> ent.removePotionEffect(ef.getType()));
+	}
+
+	/**
+	 * Gets the center point of an entity based on its bounding box
+	 * @param entity The entity
+	 * @return The entity's center
+	 */
+	public static Location getEntityCenter(Entity entity) {
+		return entity.getBoundingBox().getCenter().toLocation(entity.getWorld());
 	}
 
 	/**

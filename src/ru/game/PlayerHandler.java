@@ -189,6 +189,13 @@ public class PlayerHandler implements Listener {
 	}
 
 	@EventHandler
+	public void noHandSwap(PlayerSwapHandItemsEvent e) {
+		if(isPlaying(e.getPlayer())) {
+			e.setCancelled(true);
+		}
+	}
+
+	@EventHandler
 	public void move(PlayerMoveEvent e) {
 		Player player = e.getPlayer();
 		if(isPlaying(player)) {

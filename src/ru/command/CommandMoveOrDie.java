@@ -116,6 +116,9 @@ public class CommandMoveOrDie implements CommandExecutor, TabCompleter {
 					Mode toSwitch = ModeManager.getByID(args[2]);
 					if(toSwitch != null) {
 						ModeManager.endRound();
+						if(ModeManager.getActiveMode() != null) {
+							ModeManager.getActiveMode().onRoundEnd();
+						}
 						ModeManager.startNewRound(toSwitch);
 					} else {
 						player.sendMessage(ChatColor.RED + "Incorrect mode");
