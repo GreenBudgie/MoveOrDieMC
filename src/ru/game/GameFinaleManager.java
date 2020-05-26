@@ -30,7 +30,7 @@ public class GameFinaleManager {
 		for(MDPlayer mdPlayer : PlayerHandler.getMDPlayers()) {
 			Player player = mdPlayer.getPlayer();
 			mdPlayer.resurrect();
-			player.sendTitle(mdPlayer.getColor() + mdPlayer.getNickname(), ChatColor.AQUA + "" + ChatColor.BOLD + "Выиграл!", 10, 60, 20);
+			player.sendTitle(winner.getColor() + winner.getNickname(), ChatColor.AQUA + "" + ChatColor.BOLD + "Выиграл!", 10, 60, 20);
 			PlayerHandler.resetNoEffects(player);
 			player.setGameMode(GameMode.ADVENTURE);
 			if(mdPlayer != winner) {

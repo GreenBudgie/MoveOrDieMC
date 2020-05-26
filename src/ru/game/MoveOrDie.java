@@ -75,8 +75,12 @@ public class MoveOrDie implements Listener {
 				PlayerHandler.givePlayerEffects(player);
 				player.setGameMode(GameMode.ADVENTURE);
 				player.setInvulnerable(true);
+
+				LobbyParkourHandler.stopPassing(player);
 			}
 			PlayerHandler.getPlayers().forEach(ScoreboardHandler::createGameScoreboard);
+			//TODO Now the game starts right from mutator selection
+			if(GameSetupManager.FAST_START != 2) GameSetupManager.FAST_START = 1;
 			GameSetupManager.start();
 			ScoreboardHandler.updateGameTeams();
 			LobbySignManager.updateSigns();

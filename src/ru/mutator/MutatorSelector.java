@@ -92,6 +92,12 @@ public class MutatorSelector implements Listener {
 		}
 	}
 
+	public static void handlePlayerLeave(MDPlayer player) {
+		if(selectorPlayer == player) {
+			onSelect();
+		}
+	}
+
 	private static void onSelect() {
 		if(selectedMutator == null) {
 			selectedMutator = MathUtils.choose(mutatorsToSelect);

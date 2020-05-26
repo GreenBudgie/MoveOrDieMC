@@ -130,6 +130,8 @@ public class LobbyParkourHandler implements Listener {
 
 	public static void stopPassing(Player p) {
 		passingParkours.remove(p);
+		passingTicks.remove(p);
+		toUpdate.remove(p);
 	}
 
 	public static void update() {
@@ -169,7 +171,7 @@ public class LobbyParkourHandler implements Listener {
 
 	@EventHandler
 	public void cleanup(PlayerQuitEvent e) {
-		if(PlayerHandler.isInLobby(e.getPlayer())) passingParkours.remove(e.getPlayer());
+		if(PlayerHandler.isInLobby(e.getPlayer())) stopPassing(e.getPlayer());
 	}
 
 }

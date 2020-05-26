@@ -107,6 +107,11 @@ public abstract class Mode {
 	public void onPlayerDeath(MDPlayer mdPlayer) {
 	}
 
+	public void onPlayerLeave(MDPlayer mdPlayer) {
+		mdPlayer.getPlayer().setHealth(0);
+
+	}
+
 	public final boolean isActive() {
 		return ModeManager.getActiveMode() == this;
 	}

@@ -11,6 +11,7 @@ import org.bukkit.potion.PotionEffectType;
 import ru.modes.ModeManager;
 import ru.mutator.Mutator;
 import ru.mutator.MutatorManager;
+import ru.mutator.MutatorSelector;
 import ru.util.*;
 
 import javax.annotation.Nullable;
@@ -170,28 +171,35 @@ public class MDPlayer {
 				boolean closeToGhost = false;
 				for(MDPlayer mdPlayer : PlayerHandler.getMDPlayers()) {
 					if(mdPlayer != this && mdPlayer.isGhost) {
-						double distSq = EntityUtils.getEntityCenter(mdPlayer.player).distanceSquared(EntityUtils.getEntityCenter(player));
+						double distSq = player.getLocation().distanceSquared(player.getLocation());
 						if(distSq < ghostRadius * ghostRadius) {
 							closeToGhost = true;
 							break;
 						}
 					}
 				}
+				float walkSpeed = 0.2F;
 				if(closeToGhost) {
 					if(MutatorManager.DEATH_TOUCH.isActive() && MoveOrDie.DO_MOVE_DAMAGE) {
-						moveHP -= 6;
+						moveHP -= 10;
+						walkSpeed = 0.15F;
 					} else {
-						player.setWalkSpeed(0.08F);
+						walkSpeed = 0.08F;
 						player.removePotionEffect(PotionEffectType.JUMP);
 						player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 1, false, false));
 					}
 				} else {
-					player.setWalkSpeed(0.2F);
 					if(!MutatorManager.JUMP_BOOST.isActive()) {
 						player.removePotionEffect(PotionEffectType.JUMP);
 						player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 3, false, false));
 					}
 				}
+				if(ModeManager.BOMB_TAG.isActive()) {
+					if(ModeManager.BOMB_TAG.getTaggedPlayer() != null && ModeManager.BOMB_TAG.getTaggedPlayer() == player) {
+						walkSpeed += 0.1F;
+					}
+				}
+				player.setWalkSpeed(walkSpeed);
 				if(moveHP > 0) {
 					if(MoveOrDie.DO_MOVE_DAMAGE) {
 						if(MutatorManager.FLY_OR_DIE.isActive()) {
@@ -268,9 +276,21 @@ public class MDPlayer {
 	}
 
 	public void onLeave() {
+		if(GameState.MUTATOR.isRunning()) {
+			MutatorSelector.handlePlayerLeave(this);
+		}
+		if(GameState.isInGame()) {
+
+		}
+		if(GameState.ROUND_START.isRunning()) {
+
+		}
 		player.teleport(WorldManager.getLobby().getSpawnLocation());
 		cleanup();
 		remove();
+		if(PlayerHandler.getMDPlayers().isEmpty()) {
+			MoveOrDie.endGame();
+		}
 	}
 
 	public void onDeath() {

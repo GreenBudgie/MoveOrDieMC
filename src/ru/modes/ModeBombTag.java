@@ -58,7 +58,7 @@ public class ModeBombTag extends Mode implements Listener {
 	}
 
 	private void updateBombBar() {
-		bombBar.setProgress((double) delayToExplode / maxDelayToExplode);
+		bombBar.setProgress(MathUtils.clamp((double) delayToExplode / maxDelayToExplode, 0, 1));
 		String title;
 		if(tagged == null) {
 			title = ChatColor.DARK_RED + "" + ChatColor.BOLD + "Время до взрыва";
@@ -72,6 +72,10 @@ public class ModeBombTag extends Mode implements Listener {
 	private void resetCountdown() {
 		countdown = (int) Math.floor(Math.sqrt(1 + 8 * maxDelayToExplode) / 2 - 0.5);
 		prevCountdown = countdown;
+	}
+
+	public Player getTaggedPlayer() {
+		return tagged;
 	}
 
 	@Override

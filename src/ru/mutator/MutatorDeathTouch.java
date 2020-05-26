@@ -30,10 +30,10 @@ public class MutatorDeathTouch extends Mutator {
 
 	@Override
 	public void update() {
-		if(TaskManager.ticksPassed(10)) {
+		if(TaskManager.ticksPassed(8)) {
 			for(MDPlayer player : PlayerHandler.getMDPlayers()) {
 				if(player.isGhost()) {
-					ParticleUtils.createParticlesAround(player.getPlayer(), Particle.REDSTONE, Color.RED, 4);
+					ParticleUtils.createParticlesAround(player.getPlayer(), Particle.REDSTONE, Color.RED, 5);
 				}
 			}
 		}
