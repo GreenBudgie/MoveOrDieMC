@@ -119,7 +119,10 @@ public class PlayerHandler implements Listener {
 
 	public static void handleDeathResult() {
 		if(GameState.GAME.isRunning()) {
-			deathQueue.add(Sets.newHashSet(lastDeaths));
+			lastDeaths.removeIf(MDPlayer::isLeft);
+			if(!lastDeaths.isEmpty()) {
+				deathQueue.add(Sets.newHashSet(lastDeaths));
+			}
 			if(getAlive().size() <= 1) {
 				ModeManager.endRound();
 			}
@@ -130,7 +133,7 @@ public class PlayerHandler implements Listener {
 
 	public static void setDeathHandle(MDPlayer mdPlayer) {
 		if(GameState.GAME.isRunning()) {
-			lastDeaths.add(mdPlayer);
+			if(!mdPlayer.isLeft()) lastDeaths.add(mdPlayer);
 			if(deathHandleDelay == -1) {
 				deathHandleDelay = maxDeathHandleDelay;
 			}
@@ -144,6 +147,7 @@ public class PlayerHandler implements Listener {
 		player.setNoDamageTicks(0);
 		player.setExp(0);
 		player.setLevel(0);
+		player.setWalkSpeed(0.2F);
 	}
 
 	public static void givePlayerEffects(Player player) {

@@ -15,6 +15,8 @@ import ru.mutator.MutatorSelector;
 import ru.util.*;
 
 import javax.annotation.Nullable;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * Represents an in-game player, dead or alive
@@ -31,6 +33,7 @@ public class MDPlayer {
 	private int moveHP = maxMoveHP;
 	private int score = 0; //Overall score
 	private int points = 0; //Current round points
+	private boolean left = false;
 
 	public MDPlayer(Player player) {
 		this.player = player;
@@ -171,7 +174,7 @@ public class MDPlayer {
 				boolean closeToGhost = false;
 				for(MDPlayer mdPlayer : PlayerHandler.getMDPlayers()) {
 					if(mdPlayer != this && mdPlayer.isGhost) {
-						double distSq = player.getLocation().distanceSquared(player.getLocation());
+						double distSq = mdPlayer.player.getLocation().distanceSquared(player.getLocation());
 						if(distSq < ghostRadius * ghostRadius) {
 							closeToGhost = true;
 							break;
@@ -194,10 +197,8 @@ public class MDPlayer {
 						player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 3, false, false));
 					}
 				}
-				if(ModeManager.BOMB_TAG.isActive()) {
-					if(ModeManager.BOMB_TAG.getTaggedPlayer() != null && ModeManager.BOMB_TAG.getTaggedPlayer() == player) {
-						walkSpeed += 0.1F;
-					}
+				if(ModeManager.BOMB_TAG.isActive() && ModeManager.BOMB_TAG.getTaggedPlayer() == player) {
+					walkSpeed += 0.1F;
 				}
 				player.setWalkSpeed(walkSpeed);
 				if(moveHP > 0) {
@@ -246,7 +247,7 @@ public class MDPlayer {
 			ParticleUtils.createParticlesInsideSphere(player.getLocation(), 3, Particle.FALLING_LAVA, null, 25);
 			ParticleUtils.createParticlesInsideSphere(player.getLocation(), 2, Particle.REDSTONE, ParticleUtils.toColor(color), 40);
 			player.getWorld().playSound(player.getLocation(), Sound.BLOCK_HONEY_BLOCK_FALL, 1.5F, 0.5F);
-			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 1.5F, 1.5F);
+			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 1.7F, 1.5F);
 			PlayerHandler.reset(player);
 			PlayerHandler.giveGhostEffects(player);
 			player.setGameMode(GameMode.SURVIVAL);
@@ -254,6 +255,10 @@ public class MDPlayer {
 			PlayerHandler.setDeathHandle(this);
 			ScoreboardHandler.updateGameTeams();
 		}
+	}
+
+	public boolean isLeft() {
+		return left;
 	}
 
 	public void resurrect() {
@@ -276,18 +281,35 @@ public class MDPlayer {
 	}
 
 	public void onLeave() {
+		left = true;
 		if(GameState.MUTATOR.isRunning()) {
 			MutatorSelector.handlePlayerLeave(this);
 		}
-		if(GameState.isInGame()) {
-
+		if(GameState.isInGame() && ModeManager.getActiveMode() != null) {
+			ModeManager.getActiveMode().onPlayerLeave(this);
 		}
-		if(GameState.ROUND_START.isRunning()) {
-
+		if(GameState.GAME.isRunning()) {
+			Iterator<Set<MDPlayer>> iterator = PlayerHandler.getDeathQueue().iterator();
+			while(iterator.hasNext()) {
+				Set<MDPlayer> set = iterator.next();
+				set.remove(this);
+				if(set.isEmpty()) {
+					iterator.remove();
+				}
+			}
 		}
+		Broadcaster.each(PlayerHandler.getPlayers()).toChat(color + nickname + ChatColor.RED + ChatColor.BOLD + " вышел из игры");
 		player.teleport(WorldManager.getLobby().getSpawnLocation());
+		player.setGameMode(GameMode.SURVIVAL);
 		cleanup();
 		remove();
+		if(PlayerHandler.getMDPlayers().size() == 1) {
+			if(ModeManager.getActiveMode() != null) {
+				ModeManager.getActiveMode().end();
+				ModeManager.getActiveMode().onRoundEnd();
+			}
+			GameFinaleManager.start(PlayerHandler.getMDPlayers().get(0));
+		}
 		if(PlayerHandler.getMDPlayers().isEmpty()) {
 			MoveOrDie.endGame();
 		}

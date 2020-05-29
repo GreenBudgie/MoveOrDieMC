@@ -5,6 +5,7 @@ import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import ru.game.GameState;
 import ru.game.MDPlayer;
 import ru.game.PlayerHandler;
 import ru.game.WorldManager;
@@ -82,14 +83,16 @@ public abstract class Mode {
 	}
 
 	public final void end() {
-		for(Player player : PlayerHandler.getPlayers()) {
-			player.setInvulnerable(true);
+		if(GameState.GAME.isRunning()) {
+			for(Player player : PlayerHandler.getPlayers()) {
+				player.setInvulnerable(true);
+			}
+			WorldManager.getCurrentGameWorld().setPVP(false);
+			if(this instanceof Listener) {
+				HandlerList.unregisterAll((Listener) this);
+			}
+			onRoundPreEnd();
 		}
-		WorldManager.getCurrentGameWorld().setPVP(false);
-		if(this instanceof Listener) {
-			HandlerList.unregisterAll((Listener) this);
-		}
-		onRoundPreEnd();
 	}
 
 	public void onRoundPrepare() {
@@ -108,8 +111,9 @@ public abstract class Mode {
 	}
 
 	public void onPlayerLeave(MDPlayer mdPlayer) {
-		mdPlayer.getPlayer().setHealth(0);
-
+		if(GameState.GAME.isRunning() && !mdPlayer.isGhost()) {
+			mdPlayer.getPlayer().setHealth(0);
+		}
 	}
 
 	public final boolean isActive() {

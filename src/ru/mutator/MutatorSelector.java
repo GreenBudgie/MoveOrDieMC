@@ -94,6 +94,7 @@ public class MutatorSelector implements Listener {
 
 	public static void handlePlayerLeave(MDPlayer player) {
 		if(selectorPlayer == player) {
+			GameState.setTimer(3);
 			onSelect();
 		}
 	}

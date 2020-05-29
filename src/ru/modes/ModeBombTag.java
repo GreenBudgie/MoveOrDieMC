@@ -1,34 +1,29 @@
 package ru.modes;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ListMultimap;
 import org.bukkit.*;
-import org.bukkit.block.Block;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
-import org.bukkit.craftbukkit.libs.jline.internal.Nullable;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import ru.game.MDPlayer;
 import ru.game.PlayerHandler;
-import ru.util.*;
+import ru.util.EntityUtils;
+import ru.util.ItemUtils;
+import ru.util.MathUtils;
+import ru.util.ParticleUtils;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 public class ModeBombTag extends Mode implements Listener {
 
 	private Player tagged = null;
-	private final int maxDelayToExplode = 140, maxDelayToPickNew = 20;
+	private final int maxDelayToExplode = 160, maxDelayToPickNew = 20;
 	private int delayToExplode = maxDelayToExplode, delayToPickNew = 0, countdown = 20, prevCountdown = countdown;
 	private boolean deathByExplosion = false;
 	private BossBar bombBar = Bukkit.createBossBar("", BarColor.RED, BarStyle.SOLID);
