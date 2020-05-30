@@ -20,6 +20,7 @@ public class CustomBlockManager {
 	public static final CustomBlockDeath DEATH = new CustomBlockDeath();
 	public static final CustomBlockGlass GLASS = new CustomBlockGlass();
 	public static final CustomBlockTeleporter TELEPOTER = new CustomBlockTeleporter();
+	public static final CustomBlockAccelerator ACCELERATOR = new CustomBlockAccelerator();
 
 	public static void update() {
 		customBlocks.forEach(CustomBlock::update);

@@ -98,11 +98,14 @@ public class CustomBlockTeleporter extends CustomBlock {
 		if(teleportFrom == null) return true;
 		Location teleportTo = getLinkedTeleporter(teleportFrom);
 		if(teleportTo == null) return true;
+		Location resultFrom = teleportFrom.clone();
+		resultFrom.setWorld(player.getWorld());
 		Location resultTo = teleportTo.clone();
 		resultTo.setWorld(player.getWorld());
 		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1F, 1.5F);
 		EntityUtils.teleportCentered(player, resultTo, true, true);
 		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1F, 1.5F);
+		ParticleUtils.createLine(resultFrom.clone().add(0.5, 0.5, 0.5), resultTo.clone().add(0.5, 0.5, 0.5), Particle.REDSTONE, 2, Color.PURPLE);
 
 		Vector direction = face.getOppositeFace().getDirection();
 		Vector playerDirection = player.getLocation().getDirection();

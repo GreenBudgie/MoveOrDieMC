@@ -56,7 +56,7 @@ public class CustomBlockSpringboard extends CustomBlock {
 		if(direction.getX() != 0) playerDirection.setX(0);
 		if(direction.getY() != 0) playerDirection.setY(0);
 		if(direction.getZ() != 0) playerDirection.setZ(0);
-		playerDirection.add(direction.multiply(1.3));
+		playerDirection.add(direction.multiply(1.4));
 		player.setVelocity(playerDirection);
 		TaskManager.invokeLater(() -> player.setVelocity(playerDirection), 1L);
 		player.getWorld().playSound(player.getLocation(), Sound.BLOCK_PISTON_EXTEND, 1F, 1.5F);

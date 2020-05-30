@@ -28,6 +28,10 @@ public class Broadcaster {
 		Bukkit.broadcastMessage(msg == null ? "null" : msg.toString());
 	}
 
+	public static void initInfo(Object msg) {
+		TaskManager.invokeLater(() -> info(msg));
+	}
+
 	public static Broadcaster everybody() {
 		return new Broadcaster(Lists.newArrayList(Bukkit.getOnlinePlayers()));
 	}
