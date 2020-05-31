@@ -64,6 +64,12 @@ public class MapManager {
 				map.setSpawns(locations);
 				map.setSupportedModes(modes);
 				map.setRegion(region);
+				for(Mode mode : modes) {
+					ConfigurationSection modeSection  = section.getConfigurationSection(mode.getID());
+					if(modeSection != null) {
+						mode.deserializeMapOptions(map, modeSection);
+					}
+				}
 				maps.add(map);
 			}
 		}

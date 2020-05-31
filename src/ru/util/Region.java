@@ -3,6 +3,7 @@ package ru.util;
 import com.google.common.collect.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
@@ -119,6 +120,14 @@ public class Region implements ConfigurationSerializable {
 	 */
 	public Location getRandomInsideBlockLocation() {
 		return new Location(getWorld(), MathUtils.randomRange(x1, x2), MathUtils.randomRange(y1, y2), MathUtils.randomRange(z1, z2));
+	}
+
+	/**
+	 * Gets the random location of an air block (integer) inside of a region
+	 * @return Random air block location inside of a region
+	 */
+	public Location getRandomInsideAirBlockLocation() {
+		return MathUtils.choose(getAirBlocksInside()).getLocation();
 	}
 
 	/**
@@ -438,6 +447,24 @@ public class Region implements ConfigurationSerializable {
 			for(int y = y1; y <= y2; y++) {
 				for(int z = z1; z <= z2; z++) {
 					blocks.add(new Location(start.getWorld(), x, y, z).getBlock());
+				}
+			}
+		}
+		return blocks;
+	}
+
+	/**
+	 * Gets the list of air blocks that are inside or on the edges of a region. This method uses {@link #validateWorlds() world validation}
+	 * @return List of air blocks
+	 */
+	public Set<Block> getAirBlocksInside() {
+		validateWorlds();
+		Set<Block> blocks = new HashSet<>();
+		for(int x = x1; x <= x2; x++) {
+			for(int y = y1; y <= y2; y++) {
+				for(int z = z1; z <= z2; z++) {
+					Block currentBlock = new Location(start.getWorld(), x, y, z).getBlock();
+					if(currentBlock.getType() == Material.AIR) blocks.add(currentBlock);
 				}
 			}
 		}

@@ -2,6 +2,7 @@ package ru.modes;
 
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.*;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
@@ -12,6 +13,8 @@ import ru.game.WorldManager;
 import ru.map.GameMap;
 import ru.map.MapManager;
 import ru.start.Plugin;
+
+import java.util.Map;
 
 public abstract class Mode {
 
@@ -51,6 +54,9 @@ public abstract class Mode {
 	}
 
 	public void update() {
+	}
+
+	public void deserializeMapOptions(GameMap map, ConfigurationSection options) {
 	}
 
 	public final void prepare() {

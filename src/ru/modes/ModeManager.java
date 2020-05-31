@@ -37,6 +37,7 @@ public class ModeManager implements Listener {
 	public static ModeDangerBuilder DANGER_BUILDER = new ModeDangerBuilder();
 	public static ModeFall FALL = new ModeFall();
 	public static ModeBombTag BOMB_TAG = new ModeBombTag();
+	public static ModeCrossbower CROSSBOWER = new ModeCrossbower();
 
 	public static List<Mode> getModes() {
 		return modes;

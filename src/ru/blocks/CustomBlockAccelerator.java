@@ -9,6 +9,7 @@ import org.bukkit.block.data.Orientable;
 import org.bukkit.block.data.type.Piston;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import ru.game.MDPlayer;
 import ru.util.Broadcaster;
 import ru.util.ParticleUtils;
 import ru.util.TaskManager;
@@ -19,7 +20,6 @@ import java.util.Map;
 
 public class CustomBlockAccelerator extends CustomBlock {
 
-	private Map<Location, Integer> resetDelay = new HashMap<>();
 	private Map<Player, Integer> fireDelay = new HashMap<>();
 	private static int maxFireDelay = 8;
 
@@ -34,16 +34,6 @@ public class CustomBlockAccelerator extends CustomBlock {
 
 	@Override
 	public void update() {
-		Iterator<Location> resetIterator = resetDelay.keySet().iterator();
-		while(resetIterator.hasNext()) {
-			Location location = resetIterator.next();
-			int ticks = resetDelay.get(location);
-			if(ticks <= 0) {
-				resetIterator.remove();
-			} else {
-				resetDelay.put(location, ticks - 1);
-			}
-		}
 		Iterator<Player> fireIterator = fireDelay.keySet().iterator();
 		while(fireIterator.hasNext()) {
 			Player player = fireIterator.next();
@@ -55,6 +45,10 @@ public class CustomBlockAccelerator extends CustomBlock {
 			if(ticks <= 0) {
 				fireIterator.remove();
 			} else {
+				MDPlayer mdPlayer = MDPlayer.fromPlayer(player);
+				if(!player.isOnGround() && mdPlayer != null) {
+					mdPlayer.handleWalkHp();
+				}
 				ParticleUtils.createParticlesAround(player, Particle.REDSTONE, Color.fromRGB(230, 120, 230), (int) Math.ceil(((double) ticks / maxFireDelay) * 3));
 				fireDelay.put(player, ticks - 1);
 			}
@@ -63,7 +57,7 @@ public class CustomBlockAccelerator extends CustomBlock {
 
 	@Override
 	public boolean onTouch(Player player, Block block, BlockFace face) {
-		if(resetDelay.containsKey(block.getLocation())) return true;
+		if(fireDelay.containsKey(player)) return true;
 		Directional directional = (Directional) block.getBlockData();
 		BlockFace blockDirection = directional.getFacing();
 		BlockFace arrowDirection = BlockFace.UP;
@@ -111,13 +105,6 @@ public class CustomBlockAccelerator extends CustomBlock {
 		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 1F, 0.5F);
 		ParticleUtils.createParticlesAround(player, Particle.CLOUD, null, 8);
 		fireDelay.put(player, maxFireDelay);
-		for(int x = -1; x <= 1; x++) {
-			for(int y = -1; y <= 1; y++) {
-				for(int z = -1; z <= 1; z++) {
-					resetDelay.put(block.getLocation().add(x, y, z), 7);
-				}
-			}
-		}
 		return true;
 	}
 

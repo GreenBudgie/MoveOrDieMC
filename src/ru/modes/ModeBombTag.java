@@ -30,7 +30,7 @@ public class ModeBombTag extends Mode implements Listener {
 
 	@Override
 	public String getName() {
-		return "Минное Ремесло";
+		return "Bomb Tag";
 	}
 
 	@Override
