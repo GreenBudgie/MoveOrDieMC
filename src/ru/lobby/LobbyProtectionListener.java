@@ -1,6 +1,7 @@
 package ru.lobby;
 
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -12,9 +13,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.event.vehicle.VehicleEntityCollisionEvent;
 import ru.game.PlayerHandler;
@@ -33,6 +32,20 @@ public class LobbyProtectionListener implements Listener {
 			if(isInLobby(p)) {
 				e.setCancelled(true);
 			}
+		}
+	}
+
+	@EventHandler
+	public void noLecternBookTake(PlayerTakeLecternBookEvent e) {
+		Player player = e.getPlayer();
+		if(isInLobby(player)) {
+			if(!player.getInventory().contains(Material.WRITTEN_BOOK)) {
+				player.getInventory().addItem(e.getBook());
+				player.closeInventory();
+			} else {
+				player.getInventory().remove(Material.WRITTEN_BOOK);
+			}
+			e.setCancelled(true);
 		}
 	}
 

@@ -1,15 +1,14 @@
 package ru.blocks;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Streams;
+import com.google.common.collect.*;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Piston;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import ru.game.PlayerHandler;
+import ru.game.WorldManager;
 import ru.util.*;
 
 import java.util.*;
@@ -20,6 +19,12 @@ public class CustomBlockTeleporter extends CustomBlock {
 	private Map<Location, Integer> resetDelay = new HashMap<>();
 	private final Material OFF_MATERIAL = Material.DARK_PRISMARINE;
 	public static BiMap<Location, Location> links = HashBiMap.create();
+	public static List<Location> lobbyLinks = new ArrayList<>();
+
+	static {
+		lobbyLinks.add(new Location(WorldManager.getLobby(), 44, 12, 6));
+		lobbyLinks.add(new Location(WorldManager.getLobby(), 44, 12, 26));
+	}
 
 	@Override
 	public Material getType() {
@@ -91,17 +96,33 @@ public class CustomBlockTeleporter extends CustomBlock {
 		}
 	}
 
+	private Location getClosestLobbyTeleporter(Location loc) {
+		return lobbyLinks.get(0).distanceSquared(loc) <= lobbyLinks.get(1).distanceSquared(loc) ? lobbyLinks.get(0) : lobbyLinks.get(1);
+	}
+
 	@Override
 	public boolean onTouch(Player player, Block block, BlockFace face) {
 		if(resetDelay.containsKey(block.getLocation())) return true;
-		Location teleportFrom = getClosestTeleporter(block.getLocation());
-		if(teleportFrom == null) return true;
-		Location teleportTo = getLinkedTeleporter(teleportFrom);
-		if(teleportTo == null) return true;
-		Location resultFrom = teleportFrom.clone();
-		resultFrom.setWorld(player.getWorld());
-		Location resultTo = teleportTo.clone();
-		resultTo.setWorld(player.getWorld());
+		Location resultFrom, resultTo;
+		if(PlayerHandler.isInLobby(player)) {
+			List<Location> toTeleport = Lists.newArrayList(lobbyLinks);
+			Location closest = getClosestLobbyTeleporter(block.getLocation());
+			if(closest == null) return true;
+			toTeleport.remove(closest);
+			if(toTeleport.size() != 1) return true;
+			resultFrom = closest;
+			resultTo = toTeleport.get(0);
+		} else {
+			Location teleportFrom = getClosestTeleporter(block.getLocation());
+			if(teleportFrom == null) return true;
+			Location teleportTo = getLinkedTeleporter(teleportFrom);
+			if(teleportTo == null) return true;
+			resultFrom = teleportFrom.clone();
+			resultFrom.setWorld(player.getWorld());
+			resultTo = teleportTo.clone();
+			resultTo.setWorld(player.getWorld());
+		}
+
 		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1F, 1.5F);
 		EntityUtils.teleportCentered(player, resultTo, true, true);
 		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1F, 1.5F);

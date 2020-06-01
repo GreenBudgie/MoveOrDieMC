@@ -193,8 +193,12 @@ public class PlayerHandler implements Listener {
 	}
 
 	@EventHandler
-	public void noHandSwap(PlayerSwapHandItemsEvent e) {
+	public void handSwap(PlayerSwapHandItemsEvent e) {
 		if(isPlaying(e.getPlayer())) {
+			MDPlayer player = MDPlayer.fromPlayer(e.getPlayer());
+			if(player != null) {
+				player.switchSidebarSize();
+			}
 			e.setCancelled(true);
 		}
 	}

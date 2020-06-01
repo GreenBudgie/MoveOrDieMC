@@ -18,6 +18,7 @@ import org.bukkit.event.entity.ItemMergeEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.CrossbowMeta;
 import ru.game.MDPlayer;
 import ru.game.PlayerHandler;
@@ -114,7 +115,7 @@ public class ModeCrossbower extends Mode implements Listener {
 	}
 
 	private void dropArrow(Location location) {
-		Item arrow = location.getWorld().dropItem(location, new ItemStack(Material.ARROW));
+		Item arrow = location.getWorld().dropItem(location.clone().add(0.5, 0.5, 0.5), new ItemStack(Material.ARROW));
 		arrow.setPickupDelay(5);
 		arrow.setGlowing(true);
 		arrow.setInvulnerable(true);
@@ -153,7 +154,9 @@ public class ModeCrossbower extends Mode implements Listener {
 				if(e.getCause() == EntityDamageEvent.DamageCause.PROJECTILE) {
 					e.setDamage(100);
 				} else {
-					e.setCancelled(true);
+					if(e.getCause() != EntityDamageEvent.DamageCause.BLOCK_EXPLOSION && e.getCause() != EntityDamageEvent.DamageCause.ENTITY_EXPLOSION) {
+						e.setCancelled(true);
+					}
 				}
 			}
 		}

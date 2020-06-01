@@ -8,8 +8,8 @@ import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scoreboard.ScoreboardManager;
 import ru.modes.ModeManager;
-import ru.mutator.Mutator;
 import ru.mutator.MutatorManager;
 import ru.mutator.MutatorSelector;
 import ru.util.*;
@@ -23,7 +23,6 @@ import java.util.Set;
  */
 public class MDPlayer {
 
-	private final double ghostRadius = 1.5;
 	private final int maxMoveHP = 160;
 	private String nickname;
 	private Player player;
@@ -34,6 +33,7 @@ public class MDPlayer {
 	private int score = 0; //Overall score
 	private int points = 0; //Current round points
 	private boolean left = false;
+	private int sidebarSize = 3; //3 - all information, 2 - reduced info (no nicknames, only colors; no additional info), 1 - only primary info (alive colors, mode time); 0 - hide info
 
 	public MDPlayer(Player player) {
 		this.player = player;
@@ -44,6 +44,16 @@ public class MDPlayer {
 			moveBar.addPlayer(player);
 			moveBar.setVisible(true);
 		}
+	}
+
+	public int getSidebarSize() {
+		return sidebarSize;
+	}
+
+	public void switchSidebarSize() {
+		sidebarSize = sidebarSize == 0 ? 3 : sidebarSize - 1;
+		player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_XYLOPHONE, 0.5F,  (sidebarSize + 1) * 0.1F + 1.2F);
+		ScoreboardHandler.updateGameScoreboard(player);
 	}
 
 	/**
@@ -175,6 +185,7 @@ public class MDPlayer {
 				for(MDPlayer mdPlayer : PlayerHandler.getMDPlayers()) {
 					if(mdPlayer != this && mdPlayer.isGhost) {
 						double distSq = mdPlayer.player.getLocation().distanceSquared(player.getLocation());
+						double ghostRadius = 1.5;
 						if(distSq < ghostRadius * ghostRadius) {
 							closeToGhost = true;
 							break;

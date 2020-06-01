@@ -1,8 +1,6 @@
 package ru.mutator;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.block.data.type.TNT;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
@@ -58,7 +56,7 @@ public class MutatorBombDrop extends Mutator {
 	}
 
 	private int getRandomDelay() {
-		return MathUtils.randomRange(3 * 20, 5 * 20);
+		return MathUtils.randomRange(5 * 20, 9 * 20);
 	}
 
 	@Override

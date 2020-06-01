@@ -63,42 +63,72 @@ public class ScoreboardHandler {
 		if(gameInfo != null) gameInfo.unregister();
 		gameInfo = board.registerNewObjective("gameInfo", "dummy", MoveOrDie.getLogo());
 		gameInfo.setDisplaySlot(DisplaySlot.SIDEBAR);
+		if(mdPlayer.getSidebarSize() == 0) return;
 		int c = 0;
-		List<MDPlayer> sortedPlayers = Lists.newArrayList(PlayerHandler.getMDPlayers());
-		sortedPlayers.sort(Comparator.comparingInt(MDPlayer::getScore));
-		for(MDPlayer currentPlayer : sortedPlayers) {
-			String bold = currentPlayer == mdPlayer ? ChatColor.BOLD + "" : "";
-			String dead = currentPlayer.isGhost() && GameState.GAME.isRunning() ? ChatColor.STRIKETHROUGH + "" : "";
-			ChatColor pointsColor = MoveOrDie.getScoreToWin() - currentPlayer.getScore() <= MoveOrDie.getScoreForPlace(1) ? ChatColor.DARK_RED : ChatColor.GOLD;
-			String points = "";
-			if(GameState.isInGame() && ModeManager.getActiveMode().usePoints() && !currentPlayer.isGhost()) {
-				points = ChatColor.DARK_AQUA + "" + currentPlayer.getPoints() + ChatColor.DARK_GRAY + " | ";
-			}
-			Score score = gameInfo.getScore(
-					points + currentPlayer.getColor() + bold + dead + currentPlayer.getNickname() + ChatColor.RESET + ChatColor.GRAY + " - " + pointsColor + ChatColor.BOLD
-							+ currentPlayer.getScore());
-			score.setScore(c++);
-		}
-		Score splitter = gameInfo.getScore(ChatColor.GRAY + "> " + ChatColor.DARK_AQUA + "Игра до: " + ChatColor.AQUA + ChatColor.BOLD + MoveOrDie.getScoreToWin() + ChatColor.RESET + ChatColor.GRAY + " <");
-		splitter.setScore(c++);
+		c = renderPlayers(mdPlayer, gameInfo, c);
 		if(GameState.isInGame()) {
-			if(MutatorManager.getActiveMutator() != null) {
-				Score mutator = gameInfo.getScore(
-						ChatColor.YELLOW + "Мутатор" + ChatColor.GRAY + ": " + ChatColor.DARK_RED + ChatColor.BOLD + MutatorManager.getActiveMutator().getName());
-				mutator.setScore(c++);
-			}
-			String timer;
-			if(ModeManager.isSuddenDeath()){
-				timer = ChatColor.DARK_RED + "" + ChatColor.BOLD + " \u274C";
-			} else {
-				timer = ModeManager.getActiveMode().hasTime() && GameState.GAME.isRunning() ? ChatColor.AQUA + " " + GameState.getTimer() : "";
-			}
-			Score mode = gameInfo.getScore(
-					ChatColor.GREEN + "Режим" + ChatColor.GRAY + ": " + ModeManager.getActiveMode().getColoredName() + timer);
-			mode.setScore(c++);
+			c = renderModeAndMutator(mdPlayer, gameInfo, c);
 		}
 		Score round = gameInfo.getScore(ChatColor.DARK_GREEN + "Раунд" + ChatColor.GRAY + ": " + ChatColor.WHITE + ChatColor.BOLD + MoveOrDie.getPassedRounds());
 		round.setScore(c);
+	}
+
+	private static int renderPlayers(MDPlayer player, Objective obj, int c) {
+		List<MDPlayer> sortedPlayers = Lists.newArrayList(PlayerHandler.getMDPlayers());
+		sortedPlayers.sort(Comparator.comparingInt(MDPlayer::getScore));
+		if(player.getSidebarSize() == 1) {
+			StringBuilder result = new StringBuilder(ChatColor.GOLD + "Игроки: ");
+			for(MDPlayer currentPlayer : sortedPlayers) {
+				result.append(currentPlayer.getColor()).append(currentPlayer.isGhost() ? "\u274C" : "\u25A0");
+			}
+			Score score = obj.getScore(result.toString());
+			score.setScore(c++);
+		} else {
+			for(MDPlayer currentPlayer : sortedPlayers) {
+				String bold = currentPlayer == player ? ChatColor.BOLD + "" : "";
+				String dead = currentPlayer.isGhost() && GameState.GAME.isRunning() ? ChatColor.STRIKETHROUGH + "" : "";
+				ChatColor pointsColor = MoveOrDie.getScoreToWin() - currentPlayer.getScore() <= MoveOrDie.getScoreForPlace(1) ? ChatColor.DARK_RED : ChatColor.GOLD;
+				String points = "";
+				if(GameState.isInGame() && ModeManager.getActiveMode().usePoints() && !currentPlayer.isGhost()) {
+					points = ChatColor.DARK_AQUA + "" + currentPlayer.getPoints() + ChatColor.DARK_GRAY + " | ";
+				}
+				int maxChars = currentPlayer.getSidebarSize() == 3 ? 15 : 8;
+				Score score = obj.getScore(points + currentPlayer.getColor() + bold + dead + trimTo(currentPlayer.getNickname(), maxChars) +
+								ChatColor.RESET + ChatColor.GRAY + " - " + pointsColor + ChatColor.BOLD + currentPlayer.getScore());
+				score.setScore(c++);
+			}
+			Score splitter = obj.getScore(ChatColor.GRAY + "> " + ChatColor.DARK_AQUA + "Игра до: " +
+					ChatColor.AQUA + ChatColor.BOLD + MoveOrDie.getScoreToWin() + ChatColor.RESET + ChatColor.GRAY + " <");
+			splitter.setScore(c++);
+		}
+		return c;
+	}
+
+	private static String trimTo(String str, int maxChars) {
+		if(str.length() <= maxChars - 2) return str;
+		if(maxChars <= 2) return "..";
+		return str.substring(0, maxChars - 2) + "..";
+	}
+
+	private static int renderModeAndMutator(MDPlayer player, Objective obj, int c) {
+		int size = player.getSidebarSize();
+		if(MutatorManager.getActiveMutator() != null) {
+			String m = size == 3 ? ChatColor.YELLOW + "Мутатор" + ChatColor.GRAY + ": " : "";
+			String name = trimTo(MutatorManager.getActiveMutator().getName(), size == 3 ? 100 : (size == 2 ? 13 : 8));
+			Score mutator = obj.getScore(m + ChatColor.DARK_RED + ChatColor.BOLD + name);
+			mutator.setScore(c++);
+		}
+		String timer;
+		if(ModeManager.isSuddenDeath()){
+			timer = ChatColor.DARK_RED + "" + ChatColor.BOLD + " \u274C";
+		} else {
+			timer = ModeManager.getActiveMode().hasTime() && GameState.GAME.isRunning() ? ChatColor.AQUA + " " + GameState.getTimer() : "";
+		}
+		String r = size == 3 ? ChatColor.GREEN + "Режим" + ChatColor.GRAY + ": " : "";
+		String name = trimTo(ModeManager.getActiveMode().getName(), size == 3 ? 100 : (size == 2 ? 13 : 8));
+		Score mode = obj.getScore(r + ChatColor.DARK_GREEN + ChatColor.BOLD + name + ChatColor.RESET + timer);
+		mode.setScore(c++);
+		return c;
 	}
 
 	public static void createLobbyScoreboard() {
