@@ -1,6 +1,5 @@
 package ru.modes;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -9,6 +8,7 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import ru.game.MDPlayer;
 import ru.game.PlayerHandler;
+import ru.util.EntityUtils;
 import ru.util.InventoryUtils;
 import ru.util.ItemUtils;
 import ru.util.ParticleUtils;
@@ -22,7 +22,7 @@ public class ModeFight extends Mode {
 
 	@Override
 	public String getDescription() {
-		return "Дерись... А чего еще можно было ожидать?";
+		return "Дерись. Основное ХП восстанавливается при убийстве игрока.";
 	}
 
 	@Override
@@ -60,7 +60,8 @@ public class ModeFight extends Mode {
 		if(player.getKiller() != null) {
 			Player killer = player.getKiller();
 			MDPlayer killerMd = MDPlayer.fromPlayer(killer);
-			if(killerMd != null) {
+			if(killerMd != null && !killerMd.isGhost()) {
+				EntityUtils.heal(killer);
 				killerMd.addPoint();
 			}
 		}

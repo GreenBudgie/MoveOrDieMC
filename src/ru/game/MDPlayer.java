@@ -203,12 +203,12 @@ public class MDPlayer {
 				player.setWalkSpeed(walkSpeed);
 				if(moveHP > 0) {
 					if(MoveOrDie.DO_MOVE_DAMAGE) {
-						if(MutatorManager.FLY_OR_DIE.isActive()) {
-							if(!player.isOnGround()) {
-								moveHP = MathUtils.clamp(moveHP + 6, 0, maxMoveHP);
-							}
-						}
 						if(!ModeManager.isSuddenDeath()) {
+							if(MutatorManager.FLY_OR_DIE.isActive()) {
+								if(!player.isOnGround()) {
+									moveHP = MathUtils.clamp(moveHP + 6, 0, maxMoveHP);
+								}
+							}
 							if(player.isOnGround()) {
 								moveHP -= 4;
 							} else {
@@ -250,7 +250,7 @@ public class MDPlayer {
 			player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 1.7F, 1.5F);
 			PlayerHandler.reset(player);
 			PlayerHandler.giveGhostEffects(player);
-			player.setGameMode(GameMode.SURVIVAL);
+			player.setGameMode(GameMode.ADVENTURE);
 			player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20, 0, false, false));
 			PlayerHandler.setDeathHandle(this);
 			ScoreboardHandler.updateGameTeams();

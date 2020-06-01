@@ -23,8 +23,8 @@ import java.util.stream.Collectors;
 public class ModeBombTag extends Mode implements Listener {
 
 	private Player tagged = null;
-	private final int maxDelayToExplode = 160, maxDelayToPickNew = 20;
-	private int delayToExplode = maxDelayToExplode, delayToPickNew = 0, countdown = 20, prevCountdown = countdown;
+	private final int maxDelayToExplode = 240, maxDelayToPickNew = 40;
+	private int delayToExplode = maxDelayToExplode, delayToPickNew = maxDelayToPickNew, countdown = 20, prevCountdown = countdown;
 	private boolean deathByExplosion = false;
 	private BossBar bombBar = Bukkit.createBossBar("", BarColor.RED, BarStyle.SOLID);
 
@@ -93,8 +93,8 @@ public class ModeBombTag extends Mode implements Listener {
 			if(delayToPickNew > 0) {
 				delayToPickNew--;
 			} else {
-				giveBomb(MathUtils.choose(PlayerHandler.getAlive().stream().map(MDPlayer::getPlayer).collect(Collectors.toList())));
 				delayToExplode = maxDelayToExplode;
+				giveBomb(MathUtils.choose(PlayerHandler.getAlive().stream().map(MDPlayer::getPlayer).collect(Collectors.toList())));
 			}
 		}
 	}

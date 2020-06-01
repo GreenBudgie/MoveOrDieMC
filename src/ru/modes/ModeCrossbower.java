@@ -42,7 +42,7 @@ public class ModeCrossbower extends Mode implements Listener {
 
 	@Override
 	public String getDescription() {
-		return "Подбирай стрелы и убивай других игроков!";
+		return "Подбирай стрелы и убивай других игроков! Арбалет заряжается моментально при нажатии ПКМ.";
 	}
 
 	@Override
@@ -131,7 +131,11 @@ public class ModeCrossbower extends Mode implements Listener {
 	@EventHandler
 	public void arrowPickup(EntityPickupItemEvent e) {
 		if(e.getEntityType() == EntityType.PLAYER && e.getItem().getItemStack().getType() == Material.ARROW) {
-			if(hasArrow((Player) e.getEntity())) e.setCancelled(true);
+			Player player = (Player) e.getEntity();
+			MDPlayer mdPlayer = MDPlayer.fromPlayer(player);
+			if(mdPlayer != null) {
+				if(hasArrow(player) || mdPlayer.isGhost()) e.setCancelled(true);
+			}
 		}
 	}
 

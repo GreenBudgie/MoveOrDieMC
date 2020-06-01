@@ -19,6 +19,7 @@ import org.bukkit.inventory.PlayerInventory;
 import ru.game.PlayerHandler;
 import ru.util.Broadcaster;
 import ru.util.ItemUtils;
+import ru.util.MathUtils;
 
 import java.util.*;
 
@@ -28,12 +29,12 @@ public class ModeDangerBuilder extends Mode implements Listener {
 
 	@Override
 	public String getName() {
-		return "Опасный Строитель";
+		return "Строитель";
 	}
 
 	@Override
 	public String getDescription() {
-		return "Убивай игроков, ставя перед ними смертельные блоки. Блоки нельзя ставить друг на друга!";
+		return "Убивай игроков, ставя перед ними смертельные блоки. Блоки можно ломать, добавляя их к себе в инвентарь.";
 	}
 
 	@Override
@@ -50,7 +51,7 @@ public class ModeDangerBuilder extends Mode implements Listener {
 	public void onRoundPrepare() {
 		for(Player player : PlayerHandler.getPlayers()) {
 			PlayerInventory inv = player.getInventory();
-			inv.setItem(0, new ItemStack(Material.REDSTONE_BLOCK, 64));
+			inv.setItem(0, new ItemStack(Material.REDSTONE_BLOCK, 12));
 			inv.setItem(1, ItemUtils.builder(Material.DIAMOND_PICKAXE).unbreakable().withEnchantments(new ItemUtils.Enchant(Enchantment.DIG_SPEED, 10)).build());
 		}
 	}
@@ -71,14 +72,8 @@ public class ModeDangerBuilder extends Mode implements Listener {
 	@EventHandler(priority = EventPriority.HIGH)
 	public void blockPlace(BlockPlaceEvent e) {
 		if(!e.isCancelled()) {
-			Block against = e.getBlockAgainst();
-			if(against.getType() == Material.REDSTONE_BLOCK) {
-				e.setCancelled(true);
-			} else {
-				if(PlayerHandler.isPlaying(e.getPlayer())) {
-					placedBlocks.put(e.getPlayer(), e.getBlock().getLocation());
-					e.getItemInHand().setAmount(64);
-				}
+			if(PlayerHandler.isPlaying(e.getPlayer())) {
+				placedBlocks.put(e.getPlayer(), e.getBlock().getLocation());
 			}
 		}
 	}
@@ -92,6 +87,13 @@ public class ModeDangerBuilder extends Mode implements Listener {
 				if(!blocksPlacedByPlayer.isEmpty()) {
 					if(blocksPlacedByPlayer.contains(e.getBlock().getLocation())) {
 						toCancel = false;
+						Player player = e.getPlayer();
+						ItemStack block = player.getInventory().getItem(0);
+						if(block == null) {
+							player.getInventory().setItem(0, new ItemStack(Material.REDSTONE_BLOCK));
+						} else {
+							block.setAmount(Math.min(block.getAmount() + 1, 64));
+						}
 						blocksPlacedByPlayer.remove(e.getBlock().getLocation());
 					}
 				}

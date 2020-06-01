@@ -11,6 +11,8 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import ru.game.GameState;
 import ru.game.MDPlayer;
@@ -131,6 +133,9 @@ public class ModeManager implements Listener {
 		if(MutatorManager.getActiveMutator() != null) {
 			MutatorManager.getActiveMutator().onRoundPrepare();
 		}
+		for(MDPlayer mdPlayer : PlayerHandler.getMDPlayers()) {
+			mdPlayer.resetPoints();
+		}
 		GameState.setTimer(6);
 		GameState.ROUND_START.set();
 	}
@@ -191,7 +196,7 @@ public class ModeManager implements Listener {
 			Set<MDPlayer> placePlayers = winQueue.get(i);
 			int score = MoveOrDie.getScoreForPlace(i + 1);
 			for(MDPlayer player : placePlayers) {
-				player.addScore(score, !draw);
+				player.addScore(score, !draw && alive.contains(player));
 			}
 			StringBuilder builder = new StringBuilder();
 			for(MDPlayer currentPlayer : placePlayers) {
@@ -222,6 +227,17 @@ public class ModeManager implements Listener {
 	public void tntExplosion(EntityExplodeEvent e) {
 		if(e.getEntityType() == EntityType.PRIMED_TNT) {
 			e.blockList().clear();
+		}
+	}
+
+	@EventHandler
+	public void ghostAttack(EntityDamageByEntityEvent e) {
+		if(e.getEntity() instanceof Player && e.getDamager() instanceof Player) {
+			MDPlayer victim = MDPlayer.fromPlayer((Player) e.getEntity());
+			MDPlayer damager = MDPlayer.fromPlayer((Player) e.getDamager());
+			if(victim != null && damager != null) {
+				if(victim.isGhost() || damager.isGhost()) e.setCancelled(true);
+			}
 		}
 	}
 
