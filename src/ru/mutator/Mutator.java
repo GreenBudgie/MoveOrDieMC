@@ -1,7 +1,12 @@
 package ru.mutator;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
+import ru.game.MDPlayer;
+import ru.start.Plugin;
 
 public abstract class Mutator {
 
@@ -19,6 +24,9 @@ public abstract class Mutator {
 
 	public final void setActive() {
 		MutatorManager.activeMutator = this;
+		if(this instanceof Listener) {
+			Bukkit.getPluginManager().registerEvents((Listener) this, Plugin.INSTANCE);
+		}
 		onFirstActivate();
 	}
 
@@ -38,6 +46,12 @@ public abstract class Mutator {
 	}
 
 	public void onDeactivate() {
+	}
+
+	public void onPlayerDeath(MDPlayer player) {
+	}
+
+	public void onPlayerLeave(MDPlayer player) {
 	}
 
 	public void update() {

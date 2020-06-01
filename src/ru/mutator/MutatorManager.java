@@ -1,5 +1,6 @@
 package ru.mutator;
 
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
 import java.util.ArrayList;
@@ -17,6 +18,8 @@ public class MutatorManager implements Listener {
 	public static MutatorBombDrop BOMB_DROP = new MutatorBombDrop();
 	public static MutatorDeathTouch DEATH_TOUCH = new MutatorDeathTouch();
 	public static MutatorFlyOrDie FLY_OR_DIE = new MutatorFlyOrDie();
+	public static MutatorBoost BOOST = new MutatorBoost();
+	public static MutatorHardcore HARDCORE = new MutatorHardcore();
 
 	public static void update() {
 		if(activeMutator != null) {
@@ -34,6 +37,9 @@ public class MutatorManager implements Listener {
 
 	public static void deactivateMutator() {
 		if(activeMutator != null) {
+			if(activeMutator instanceof Listener) {
+				HandlerList.unregisterAll((Listener) activeMutator);
+			}
 			activeMutator.onDeactivate();
 			activeMutator = null;
 		}

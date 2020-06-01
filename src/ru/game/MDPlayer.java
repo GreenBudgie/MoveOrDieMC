@@ -123,14 +123,19 @@ public class MDPlayer {
 
 	public void handleSprintHp() {
 		if(!ModeManager.isSuddenDeath() && !MutatorManager.FLY_OR_DIE.isActive()) {
-			moveHP = MathUtils.clamp(moveHP + 8, 0, maxMoveHP);
+			changeMoveHp(8);
 		}
 	}
 
 	public void handleWalkHp() {
 		if(!ModeManager.isSuddenDeath() && !MutatorManager.FLY_OR_DIE.isActive()) {
-			moveHP = MathUtils.clamp(moveHP + 5, 0, maxMoveHP);
+			changeMoveHp(5);
 		}
+	}
+
+	public void changeMoveHp(int amount) {
+		if(MutatorManager.HARDCORE.isActive()) amount *= 2;
+		moveHP += amount;
 	}
 
 	private void updateActionBar() {
@@ -217,16 +222,18 @@ public class MDPlayer {
 						if(!ModeManager.isSuddenDeath()) {
 							if(MutatorManager.FLY_OR_DIE.isActive()) {
 								if(!player.isOnGround()) {
-									moveHP = MathUtils.clamp(moveHP + 6, 0, maxMoveHP);
+									changeMoveHp(6);
 								}
 							}
 							if(player.isOnGround()) {
-								moveHP -= 4;
+								changeMoveHp(-4);
 							} else {
-								if(!MutatorManager.FLY_OR_DIE.isActive()) moveHP -= 2;
+								if(!MutatorManager.FLY_OR_DIE.isActive()) {
+									changeMoveHp(-2);
+								}
 							}
 						} else {
-							moveHP -= 1;
+							changeMoveHp(-1);
 						}
 					}
 				} else {
@@ -235,6 +242,7 @@ public class MDPlayer {
 			} else {
 				moveHP = maxMoveHP;
 			}
+			moveHP = MathUtils.clamp(moveHP, 0, maxMoveHP);
 			double value = (double) moveHP / maxMoveHP;
 			if(value > 0.5) {
 				moveBar.setColor(BarColor.GREEN);
@@ -244,6 +252,9 @@ public class MDPlayer {
 				moveBar.setColor(BarColor.RED);
 			}
 			moveBar.setProgress(value);
+			if(value < 0.25) {
+				player.sendTitle("", ChatColor.DARK_RED + "" + ChatColor.BOLD + "Опасно!", 0, 3, 5);
+			}
 		}
 		updateActionBar();
 	}
@@ -296,8 +307,13 @@ public class MDPlayer {
 		if(GameState.MUTATOR.isRunning()) {
 			MutatorSelector.handlePlayerLeave(this);
 		}
-		if(GameState.isInGame() && ModeManager.getActiveMode() != null) {
-			ModeManager.getActiveMode().onPlayerLeave(this);
+		if(GameState.isInGame()) {
+			if(ModeManager.getActiveMode() != null) {
+				ModeManager.getActiveMode().onPlayerLeave(this);
+			}
+			if(MutatorManager.getActiveMutator() != null) {
+				MutatorManager.getActiveMutator().onPlayerLeave(this);
+			}
 		}
 		if(GameState.GAME.isRunning()) {
 			Iterator<Set<MDPlayer>> iterator = PlayerHandler.getDeathQueue().iterator();
@@ -330,6 +346,9 @@ public class MDPlayer {
 		if(GameState.GAME.isRunning()) {
 			Broadcaster.each(PlayerHandler.getPlayers()).toChat(ChatColor.DARK_RED + "" + ChatColor.BOLD + "\u274C " + ChatColor.RESET + color + nickname);
 			ModeManager.getActiveMode().onPlayerDeath(this);
+			if(MutatorManager.getActiveMutator() != null) {
+				MutatorManager.getActiveMutator().onPlayerDeath(this);
+			}
 			makeGhost();
 		}
 	}

@@ -79,7 +79,7 @@ public class MoveOrDie implements Listener {
 				LobbyParkourHandler.stopPassing(player);
 			}
 			PlayerHandler.getPlayers().forEach(ScoreboardHandler::createGameScoreboard);
-			//TODO Now the game starts right from mutator selection
+			//FIXME Now the game starts right from mutator selection
 			if(GameSetupManager.FAST_START != 2) GameSetupManager.FAST_START = 1;
 			GameSetupManager.start();
 			ScoreboardHandler.updateGameTeams();
@@ -99,6 +99,7 @@ public class MoveOrDie implements Listener {
 				player.setInvulnerable(false);
 				mdPlayer.cleanup();
 			}
+			MutatorManager.deactivateMutator();
 			MapManager.cleanup();
 			PlayerHandler.getMDPlayers().clear();
 			GameState.STOPPED.set();

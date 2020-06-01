@@ -7,6 +7,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Piston;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import ru.game.MDPlayer;
 import ru.game.PlayerHandler;
 import ru.game.WorldManager;
 import ru.util.*;
@@ -103,6 +104,8 @@ public class CustomBlockTeleporter extends CustomBlock {
 	@Override
 	public boolean onTouch(Player player, Block block, BlockFace face) {
 		if(resetDelay.containsKey(block.getLocation())) return true;
+		MDPlayer mdPlayer = MDPlayer.fromPlayer(player);
+		if(mdPlayer != null && mdPlayer.isGhost()) return true;
 		Location resultFrom, resultTo;
 		if(PlayerHandler.isInLobby(player)) {
 			List<Location> toTeleport = Lists.newArrayList(lobbyLinks);

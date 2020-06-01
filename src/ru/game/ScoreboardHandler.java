@@ -24,7 +24,7 @@ public class ScoreboardHandler {
 			Team team = gameScoreboard.registerNewTeam(color.name() + "Team");
 			team.setColor(color);
 			team.setCanSeeFriendlyInvisibles(true);
-			team.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.FOR_OWN_TEAM);
+			team.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.ALWAYS);
 			team.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
 		}
 		player.setScoreboard(gameScoreboard);

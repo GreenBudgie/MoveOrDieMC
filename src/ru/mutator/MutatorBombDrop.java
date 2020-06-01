@@ -34,21 +34,19 @@ public class MutatorBombDrop extends Mutator {
 
 	@Override
 	public void update() {
-		if(GameState.GAME.isRunning()) {
-			for(MDPlayer mdPlayer : PlayerHandler.getMDPlayers()) {
-				if(!mdPlayer.isGhost()) {
-					Player player = mdPlayer.getPlayer();
-					if(delay.containsKey(player)) {
-						int del = delay.get(player);
-						if(del <= 0) {
-							TNTPrimed tnt = (TNTPrimed) player.getWorld().spawnEntity(player.getLocation(), EntityType.PRIMED_TNT);
-							tnt.setFuseTicks(35);
-							tnt.setVelocity(new Vector(MathUtils.randomRangeDouble(-0.1, 0.1), MathUtils.randomRangeDouble(0.3, 0.5),
-									MathUtils.randomRangeDouble(-0.1, 0.1)));
-							delay.put(player, getRandomDelay());
-						} else {
-							delay.put(player, del - 1);
-						}
+		for(MDPlayer mdPlayer : PlayerHandler.getMDPlayers()) {
+			if(!mdPlayer.isGhost()) {
+				Player player = mdPlayer.getPlayer();
+				if(delay.containsKey(player)) {
+					int del = delay.get(player);
+					if(del <= 0) {
+						TNTPrimed tnt = (TNTPrimed) player.getWorld().spawnEntity(player.getLocation(), EntityType.PRIMED_TNT);
+						tnt.setFuseTicks(35);
+						tnt.setVelocity(new Vector(MathUtils.randomRangeDouble(-0.1, 0.1), MathUtils.randomRangeDouble(0.3, 0.5),
+								MathUtils.randomRangeDouble(-0.1, 0.1)));
+						delay.put(player, getRandomDelay());
+					} else {
+						delay.put(player, del - 1);
 					}
 				}
 			}
@@ -56,7 +54,7 @@ public class MutatorBombDrop extends Mutator {
 	}
 
 	private int getRandomDelay() {
-		return MathUtils.randomRange(5 * 20, 9 * 20);
+		return MathUtils.randomRange(5 * 20, 8 * 20);
 	}
 
 	@Override
