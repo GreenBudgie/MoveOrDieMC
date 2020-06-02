@@ -12,6 +12,7 @@ import ru.game.PlayerHandler;
 import ru.game.WorldManager;
 import ru.map.GameMap;
 import ru.map.MapManager;
+import ru.mutator.MutatorManager;
 import ru.start.Plugin;
 
 import java.util.Map;
@@ -82,6 +83,9 @@ public abstract class Mode {
 			player.setInvulnerable(false);
 		}
 		WorldManager.getCurrentGameWorld().setPVP(allowPVP());
+		if(MutatorManager.KNOCKBACK.isActive()) {
+			WorldManager.getCurrentGameWorld().setPVP(true);
+		}
 		if(this instanceof Listener) {
 			Bukkit.getPluginManager().registerEvents((Listener) this, Plugin.INSTANCE);
 		}

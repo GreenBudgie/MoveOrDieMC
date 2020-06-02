@@ -135,6 +135,11 @@ public class MDPlayer {
 
 	public void changeMoveHp(int amount) {
 		if(MutatorManager.HARDCORE.isActive()) amount *= 2;
+		if(ModeManager.BOMB_TAG.isActive()) {
+			if(ModeManager.BOMB_TAG.getTaggedPlayer() == player) {
+				if(amount < 0) amount /= 2;
+			}
+		}
 		moveHP += amount;
 	}
 
@@ -265,6 +270,7 @@ public class MDPlayer {
 	public void makeGhost() {
 		if(!isGhost) {
 			isGhost = true;
+			player.setCollidable(false);
 			player.setInvulnerable(true);
 			ParticleUtils.createParticlesInsideSphere(player.getLocation(), 3, Particle.FALLING_LAVA, null, 25);
 			ParticleUtils.createParticlesInsideSphere(player.getLocation(), 2, Particle.REDSTONE, ParticleUtils.toColor(color), 40);
@@ -286,6 +292,7 @@ public class MDPlayer {
 	public void resurrect() {
 		if(isGhost) {
 			isGhost = false;
+			player.setCollidable(true);
 			player.setInvulnerable(true);
 			PlayerHandler.reset(player);
 			PlayerHandler.givePlayerEffects(player);

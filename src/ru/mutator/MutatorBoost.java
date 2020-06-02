@@ -34,7 +34,7 @@ public class MutatorBoost extends Mutator implements Listener {
 
 	@Override
 	public String getDescription() {
-		return "При двойном нажатии Space ты получаешь буст вперед";
+		return "При двойном нажатии Space ты получаешь буст в ту сторону, в которую смотришь";
 	}
 
 	@Override

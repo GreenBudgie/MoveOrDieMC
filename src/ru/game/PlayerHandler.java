@@ -1,5 +1,6 @@
 package ru.game;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -70,6 +71,13 @@ public class PlayerHandler implements Listener {
 
 	public static boolean isInLobby(Player p) {
 		return WorldManager.getLobby().getPlayers().contains(p)|| WorldManager.getOriginalGameWorld().getPlayers().contains(p);
+	}
+
+	public static List<Player> getLobbyPlayers() {
+		List<Player> players = new ArrayList<>();
+		players.addAll(WorldManager.getLobby().getPlayers());
+		players.addAll(WorldManager.getOriginalGameWorld().getPlayers());
+		return players;
 	}
 
 	public static boolean isPlaying(Player player) {
@@ -170,7 +178,7 @@ public class PlayerHandler implements Listener {
 		Player sender = e.getPlayer();
 		String msg = e.getMessage();
 		if(isInLobby(sender)) {
-			Broadcaster.inWorld(WorldManager.getLobby()).toChat(ChatColor.GOLD + sender.getName() + ChatColor.GRAY + ChatColor.BOLD + " > " + ChatColor.RESET + ChatColor.WHITE + msg);
+			Broadcaster.each(getLobbyPlayers()).toChat(ChatColor.GOLD + sender.getName() + ChatColor.GRAY + ChatColor.BOLD + " > " + ChatColor.RESET + ChatColor.WHITE + msg);
 		}
 		if(isPlaying(sender)) {
 			MDPlayer mdPlayer = MDPlayer.fromPlayer(sender);

@@ -20,6 +20,8 @@ public class MutatorManager implements Listener {
 	public static MutatorFlyOrDie FLY_OR_DIE = new MutatorFlyOrDie();
 	public static MutatorBoost BOOST = new MutatorBoost();
 	public static MutatorHardcore HARDCORE = new MutatorHardcore();
+	public static MutatorKnockback KNOCKBACK = new MutatorKnockback();
+	public static MutatorFallDamage FALL_DAMAGE = new MutatorFallDamage();
 
 	public static void update() {
 		if(activeMutator != null) {

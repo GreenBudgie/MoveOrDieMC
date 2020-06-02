@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import ru.game.MDPlayer;
 import ru.game.PlayerHandler;
+import ru.mutator.MutatorManager;
 import ru.util.EntityUtils;
 import ru.util.ItemUtils;
 import ru.util.MathUtils;
@@ -165,7 +166,9 @@ public class ModeBombTag extends Mode implements Listener {
 				giveBomb(victim);
 				e.setDamage(0);
 			} else {
-				e.setCancelled(true);
+				if(!MutatorManager.KNOCKBACK.isActive()) {
+					e.setCancelled(true);
+				}
 			}
 		}
 	}

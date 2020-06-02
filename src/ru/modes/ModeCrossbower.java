@@ -7,6 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -24,6 +25,7 @@ import ru.game.MDPlayer;
 import ru.game.PlayerHandler;
 import ru.game.WorldManager;
 import ru.map.GameMap;
+import ru.mutator.MutatorManager;
 import ru.util.ItemUtils;
 import ru.util.MathUtils;
 import ru.util.Region;
@@ -61,7 +63,8 @@ public class ModeCrossbower extends Mode implements Listener {
 		for(MDPlayer mdPlayer : PlayerHandler.getMDPlayers()) {
 			Player player = mdPlayer.getPlayer();
 			PlayerInventory inv = player.getInventory();
-			inv.setItem(0, ItemUtils.builder(Material.CROSSBOW).withEnchantments(new ItemUtils.Enchant(Enchantment.QUICK_CHARGE, 5)).unbreakable().build());
+			inv.setItem(0, ItemUtils.builder(Material.CROSSBOW).withEnchantments(new ItemUtils.Enchant(Enchantment.QUICK_CHARGE, 5),
+					new ItemUtils.Enchant(Enchantment.PIERCING, 3)).unbreakable().build());
 		}
 	}
 
@@ -142,6 +145,13 @@ public class ModeCrossbower extends Mode implements Listener {
 
 	@EventHandler
 	public void arrowHit(ProjectileHitEvent e) {
+		if(e.getHitEntity() instanceof Player) {
+			Player player = (Player) e.getHitEntity();
+			MDPlayer mdPlayer = MDPlayer.fromPlayer(player);
+			if(mdPlayer != null && mdPlayer.isGhost()) {
+				return;
+			}
+		}
 		dropArrow(e.getEntity().getLocation());
 		e.getEntity().remove();
 	}
@@ -150,11 +160,12 @@ public class ModeCrossbower extends Mode implements Listener {
 	public void arrowDamage(EntityDamageEvent e) {
 		if(e.getEntityType() == EntityType.PLAYER) {
 			Player player = (Player) e.getEntity();
-			if(PlayerHandler.isPlaying(player)) {
+			MDPlayer mdPlayer = MDPlayer.fromPlayer(player);
+			if(mdPlayer != null) {
 				if(e.getCause() == EntityDamageEvent.DamageCause.PROJECTILE) {
 					e.setDamage(100);
 				} else {
-					if(e.getCause() != EntityDamageEvent.DamageCause.BLOCK_EXPLOSION && e.getCause() != EntityDamageEvent.DamageCause.ENTITY_EXPLOSION) {
+					if(e.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK && !MutatorManager.KNOCKBACK.isActive()) {
 						e.setCancelled(true);
 					}
 				}
