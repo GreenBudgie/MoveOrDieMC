@@ -107,7 +107,7 @@ public class CustomBlockTeleporter extends CustomBlock {
 		MDPlayer mdPlayer = MDPlayer.fromPlayer(player);
 		if(mdPlayer != null && mdPlayer.isGhost()) return true;
 		Location resultFrom, resultTo;
-		if(PlayerHandler.isInLobby(player)) {
+		if(WorldManager.getLobby().getPlayers().contains(player)) {
 			List<Location> toTeleport = Lists.newArrayList(lobbyLinks);
 			Location closest = getClosestLobbyTeleporter(block.getLocation());
 			if(closest == null) return true;

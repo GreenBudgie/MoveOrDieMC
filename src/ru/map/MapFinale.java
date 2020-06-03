@@ -2,16 +2,20 @@ package ru.map;
 
 import com.google.common.collect.Lists;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import ru.game.WorldManager;
 import ru.util.Region;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class MapFinale {
 
 	private static List<Location> spawns = new ArrayList<>();
 	private static Location winnerSpawn = new Location(null, 10, 13, 82);
+	private static Region region = new Region(new Location(null, 0, 10, 80), new Location(null, 19, 22, 91));
 	private static Region floor = new Region(new Location(null, 2, 10, 82), new Location(null, 17, 10, 89));
 
 	static {
@@ -26,6 +30,12 @@ public class MapFinale {
 		Location location = winnerSpawn.clone();
 		location.setWorld(WorldManager.getCurrentGameWorld());
 		return location;
+	}
+
+	public static Region getRegion() {
+		Region copy = new Region(region);
+		copy.setWorld(WorldManager.getCurrentGameWorld());
+		return copy;
 	}
 
 	public static List<Location> getSpawns() {
