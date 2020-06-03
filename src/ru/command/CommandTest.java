@@ -23,7 +23,7 @@ public class CommandTest implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if(!sender.isOp()) return true;
 		Player p = (Player) sender;
-		Broadcaster.info(CustomBlockTeleporter.links);
+		ParticleUtils.createParticle(p.getLocation(), Particle.FLASH, Color.BLACK);
 		return true;
 	}
 

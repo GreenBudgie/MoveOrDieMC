@@ -91,7 +91,11 @@ public class CommandMoveOrDie implements CommandExecutor, TabCompleter {
 				}
 			}
 			if(args[0].equalsIgnoreCase("effects")) {
-				PlayerHandler.givePlayerEffects(player);
+				if(args.length >= 2 && args[1].equalsIgnoreCase("ghost")) {
+					PlayerHandler.giveGhostEffects(player);
+				} else {
+					PlayerHandler.givePlayerEffects(player);
+				}
 			}
 			if(args.length > 1 && args[0].equalsIgnoreCase("mutator")) {
 				if(args.length > 2 && args[1].equalsIgnoreCase("force")) {
@@ -139,6 +143,9 @@ public class CommandMoveOrDie implements CommandExecutor, TabCompleter {
 	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
 		if(args.length == 1) {
 			return getMatchingStrings(args, "start", "end", "mainworld", "parkour_reset", "effects", "mode", "damage", "score", "points", "mutator");
+		}
+		if(args.length == 2 && args[0].equalsIgnoreCase("effects")) {
+			return getMatchingStrings(args, "ghost");
 		}
 		if(args.length == 2 && args[0].equalsIgnoreCase("mutator")) {
 			return getMatchingStrings(args, "force", "selector", "disable");
