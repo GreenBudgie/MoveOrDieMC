@@ -71,7 +71,7 @@ public class ModeSpleef extends Mode {
 
 	@Override
 	public int getTime() {
-		return 30;
+		return 45;
 	}
 
 	@Override

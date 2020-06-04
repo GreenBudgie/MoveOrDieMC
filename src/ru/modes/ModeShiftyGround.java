@@ -61,7 +61,7 @@ public class ModeShiftyGround extends Mode {
 		phase = Phase.SAFE;
 		phaseDelay = 40;
 		prevDangerDelay = 80;
-		safePlaces = 3; //TODO (int) Math.ceil(PlayerHandler.getMDPlayers().size() / 1.5);
+		safePlaces = (int) Math.ceil(PlayerHandler.getMDPlayers().size() / 1.5) + 1;
 		blocks = map.getRegion().getBlocksInside();
 		blocks.removeIf(block -> block.getType() != SAFE_TYPE);
 	}

@@ -41,6 +41,7 @@ public class ModeManager implements Listener {
 	public static ModeBombTag BOMB_TAG = new ModeBombTag();
 	public static ModeCrossbower CROSSBOWER = new ModeCrossbower();
 	public static ModeShiftyGround SHIFTY_GROUND = new ModeShiftyGround();
+	public static ModeAnvilFall ANVIL_FALL = new ModeAnvilFall();
 
 	public static List<Mode> getModes() {
 		return modes;

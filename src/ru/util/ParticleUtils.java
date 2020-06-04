@@ -132,8 +132,13 @@ public class ParticleUtils {
 	 * @param color Color of a particle, can be null
 	 */
 	public static void createParticle(Location location, Particle particle, @Nullable Color color) {
+		if(color == null) {
+			location.getWorld().spawnParticle(particle, location,1, 0, 0, 0, 0);
+			return;
+		}
 		ParticleEffectPoint effect = new ParticleEffectPoint();
 		effect.setLocation(location);
+		effect.type = EffectType.INSTANT;
 		effect.particle = particle;
 		effect.iterations = 1;
 		if(color != null) effect.color = color;
