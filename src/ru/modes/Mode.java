@@ -6,10 +6,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import ru.game.GameState;
-import ru.game.MDPlayer;
-import ru.game.PlayerHandler;
-import ru.game.WorldManager;
+import ru.game.*;
 import ru.map.GameMap;
 import ru.map.MapManager;
 import ru.mutator.MutatorManager;
@@ -74,6 +71,7 @@ public abstract class Mode {
 			player.sendMessage("");
 			player.sendMessage(ChatColor.GRAY + StringUtils.repeat("-", 12 + getName().length()));
 			player.setGameMode(useSurvivalGameMode() ? GameMode.SURVIVAL : GameMode.ADVENTURE);
+			Rating.ROUNDS_PLAYED.increaseValue(player.getName());
 		}
 		onRoundPrepare();
 	}

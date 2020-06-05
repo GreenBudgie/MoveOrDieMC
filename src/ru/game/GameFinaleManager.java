@@ -26,6 +26,7 @@ public class GameFinaleManager {
 
 	public static void start(MDPlayer winner) {
 		GameFinaleManager.winner = winner;
+		Rating.GAMES_WON.increaseValue(winner.getNickname());
 		walls.clear();
 		for(Block block : MapFinale.getRegion().getBlocksInside()) {
 			if(block.getType() == Material.BLACK_GLAZED_TERRACOTTA) {

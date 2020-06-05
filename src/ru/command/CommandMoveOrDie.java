@@ -23,11 +23,11 @@ import java.util.stream.Collectors;
 
 public class CommandMoveOrDie implements CommandExecutor, TabCompleter {
 
-	private static List<String> getMatchingStrings(String[] args, String... possibilities) {
+	public static List<String> getMatchingStrings(String[] args, String... possibilities) {
 		return getMatchingStrings(args, Arrays.asList(possibilities));
 	}
 
-	private static List<String> getMatchingStrings(String[] inputArgs, List<String> possibleCompletions) {
+	public static List<String> getMatchingStrings(String[] inputArgs, List<String> possibleCompletions) {
 		String arg = inputArgs[inputArgs.length - 1];
 		List<String> list = Lists.newArrayList();
 		if(!possibleCompletions.isEmpty()) {

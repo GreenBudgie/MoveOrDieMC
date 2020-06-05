@@ -5,6 +5,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import ru.command.*;
 import ru.game.GameState;
 import ru.game.MoveOrDie;
+import ru.game.Rating;
 import ru.util.ParticleUtils;
 
 public class Plugin extends JavaPlugin {
@@ -19,6 +20,8 @@ public class Plugin extends JavaPlugin {
 		getCommand("test").setExecutor(new CommandTest());
 		getCommand("moveordie").setExecutor(new CommandMoveOrDie());
 		getCommand("lobby").setExecutor(new CommandLobby());
+		getCommand("rating").setExecutor(new CommandRating());
+		getCommand("opstat").setExecutor(new CommandOpStat());
 
 
 		ParticleUtils.effectManager = new EffectManager(this);
@@ -27,6 +30,7 @@ public class Plugin extends JavaPlugin {
 
 	public void onDisable() {
 		if(GameState.isPlaying()) MoveOrDie.endGame();
+		Rating.save();
 		ParticleUtils.effectManager.dispose();
 	}
 

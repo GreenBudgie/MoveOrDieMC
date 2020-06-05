@@ -129,7 +129,7 @@ public class MDPlayer {
 
 	public void handleWalkHp() {
 		if(!ModeManager.isSuddenDeath() && !MutatorManager.FLY_OR_DIE.isActive()) {
-			changeMoveHp(5);
+			changeMoveHp(6);
 		}
 	}
 

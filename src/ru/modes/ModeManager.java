@@ -14,10 +14,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
-import ru.game.GameState;
-import ru.game.MDPlayer;
-import ru.game.MoveOrDie;
-import ru.game.PlayerHandler;
+import ru.game.*;
 import ru.mutator.Mutator;
 import ru.mutator.MutatorManager;
 import ru.mutator.MutatorSelector;
@@ -219,6 +216,7 @@ public class ModeManager implements Listener {
 		} else {
 			MDPlayer winner = winQueue.get(0).iterator().next();
 			br.title(winner.getColor() + winner.getNickname(), ChatColor.GREEN + "Победил", 5, 60, 10);
+			Rating.ROUNDS_WON.increaseValue(winner.getNickname());
 		}
 		MoveOrDie.increaseRounds();
 		GameState.setTimer(5);

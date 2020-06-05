@@ -25,7 +25,8 @@ public class LobbySignManager implements Listener {
 		SignStart start = new SignStart(7, 11, -4);
 		SignPoints points = new SignPoints(6, 11, -4);
 		SignHP hp = new SignHP(7, 12, -4);
-		signs.addAll(Lists.newArrayList(start, points, hp));
+		SignRating rating = new SignRating(8, 11, -4);
+		signs.addAll(Lists.newArrayList(start, points, hp, rating));
 		updateSigns();
 	}
 

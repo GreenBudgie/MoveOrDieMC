@@ -75,6 +75,7 @@ public class MoveOrDie implements Listener {
 				PlayerHandler.givePlayerEffects(player);
 				player.setGameMode(GameMode.ADVENTURE);
 				player.setInvulnerable(true);
+				Rating.GAMES_PLAYED.increaseValue(player.getName());
 
 				LobbyParkourHandler.stopPassing(player);
 			}
@@ -108,6 +109,9 @@ public class MoveOrDie implements Listener {
 			ModeManager.cleanup();
 			MutatorSelector.cleanup();
 			WorldManager.deleteWorld();
+			if(Rating.ratingEnabled) {
+				Rating.save();
+			}
 		}
 	}
 

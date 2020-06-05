@@ -16,3 +16,11 @@ commands:
     description: Move or die (op) commands
     usage: /moveordie
     aliases: md
+  rating:
+    description: Prints player rating or ladder
+    usage: /rating [player]
+    aliases: stats
+  opstat:
+    description: Debug command
+    usage: /opstat <set/add/remove | hardreset/cleanup> [player/all] [stat/all] [value]
+    aliases: os
