@@ -34,7 +34,7 @@ public class ModeDangerBuilder extends Mode implements Listener {
 
 	@Override
 	public String getDescription() {
-		return "”бивай игроков, став€ перед ними смертельные блоки. Ѕлоки можно ломать, добавл€€ их к себе в инвентарь.";
+		return "”бивай игроков, устанавлива€ перед ними смертельные блоки. Ёти блоки можно ломать, добавл€€ их к себе в инвентарь.";
 	}
 
 	@Override

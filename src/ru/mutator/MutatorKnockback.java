@@ -40,13 +40,12 @@ public class MutatorKnockback extends Mutator implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void punch(EntityDamageByEntityEvent e) {
-		if(!ModeManager.FIGHT.isActive() && !e.isCancelled()) {
-			if(e.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK && e.getDamager() instanceof Player && e.getEntity() instanceof Player) {
-				MDPlayer damager = MDPlayer.fromPlayer((Player) e.getDamager());
-				MDPlayer victim = MDPlayer.fromPlayer((Player) e.getEntity());
-				if(damager != null && victim != null) {
-					e.setDamage(0);
-				}
+		if(!ModeManager.FIGHT.isActive() && !e.isCancelled() &&
+				e.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK && e.getDamager() instanceof Player && e.getEntity() instanceof Player) {
+			MDPlayer damager = MDPlayer.fromPlayer((Player) e.getDamager());
+			MDPlayer victim = MDPlayer.fromPlayer((Player) e.getEntity());
+			if(damager != null && victim != null && !damager.isGhost() && !victim.isGhost()) {
+				e.setDamage(0);
 			}
 		}
 	}

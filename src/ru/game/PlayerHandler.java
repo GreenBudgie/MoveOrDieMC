@@ -84,6 +84,18 @@ public class PlayerHandler implements Listener {
 		return MDPlayer.fromPlayer(player) != null;
 	}
 
+	public static boolean isPlayingAndAlive(Player player) {
+		MDPlayer md = MDPlayer.fromPlayer(player);
+		if(md == null) return false;
+		return !md.isGhost();
+	}
+
+	public static boolean isPlayingAndGhost(Player player) {
+		MDPlayer md = MDPlayer.fromPlayer(player);
+		if(md == null) return false;
+		return md.isGhost();
+	}
+
 	public static void update() {
 		for(MDPlayer mdPlayer : getMDPlayers()) {
 			mdPlayer.update();

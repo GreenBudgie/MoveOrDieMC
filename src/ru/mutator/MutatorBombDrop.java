@@ -41,7 +41,7 @@ public class MutatorBombDrop extends Mutator {
 					int del = delay.get(player);
 					if(del <= 0) {
 						TNTPrimed tnt = (TNTPrimed) player.getWorld().spawnEntity(player.getLocation(), EntityType.PRIMED_TNT);
-						tnt.setFuseTicks(35);
+						tnt.setFuseTicks(45);
 						tnt.setVelocity(new Vector(MathUtils.randomRangeDouble(-0.1, 0.1), MathUtils.randomRangeDouble(0.3, 0.5),
 								MathUtils.randomRangeDouble(-0.1, 0.1)));
 						delay.put(player, getRandomDelay());
@@ -54,7 +54,7 @@ public class MutatorBombDrop extends Mutator {
 	}
 
 	private int getRandomDelay() {
-		return MathUtils.randomRange(5 * 20, 8 * 20);
+		return MathUtils.randomRange(6 * 20, 9 * 20);
 	}
 
 	@Override

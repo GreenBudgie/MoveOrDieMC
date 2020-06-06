@@ -20,7 +20,7 @@ public class SignStart extends LobbySign {
 		if(GameState.isPlaying()) {
 			sign.setLine(1, ChatColor.DARK_BLUE + "Игра идет...");
 		} else {
-			sign.setLine(1, ChatColor.DARK_GREEN + "Начать игру");
+			sign.setLine(1, ChatColor.DARK_GREEN + "" + ChatColor.BOLD + "Начать игру");
 		}
 		sign.update();
 	}

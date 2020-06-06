@@ -11,6 +11,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.util.Vector;
 import ru.game.MDPlayer;
 import ru.game.PlayerHandler;
 import ru.mutator.MutatorManager;
@@ -162,12 +163,17 @@ public class ModeBombTag extends Mode implements Listener {
 		if(e.getEntity() instanceof Player && e.getDamager() instanceof Player) {
 			Player victim = (Player) e.getEntity();
 			Player damager = (Player) e.getDamager();
-			if(tagged == damager) {
-				giveBomb(victim);
-				e.setDamage(0);
-			} else {
-				if(!MutatorManager.KNOCKBACK.isActive()) {
-					e.setCancelled(true);
+			if(PlayerHandler.isPlayingAndAlive(victim) && PlayerHandler.isPlayingAndAlive(damager)) {
+				if(tagged == damager) {
+					Vector velocity = damager.getLocation().getDirection();
+					velocity.setY(Math.max(0, velocity.getY()) + 0.2);
+					victim.setVelocity(velocity);
+					giveBomb(victim);
+					e.setDamage(0);
+				} else {
+					if(!MutatorManager.KNOCKBACK.isActive()) {
+						e.setCancelled(true);
+					}
 				}
 			}
 		}

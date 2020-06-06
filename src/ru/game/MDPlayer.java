@@ -63,6 +63,7 @@ public class MDPlayer {
 	 */
 	@Nullable
 	public static MDPlayer fromPlayer(Player player) {
+		if(player == null) return null;
 		for(MDPlayer mdplayer : PlayerHandler.getMDPlayers()) {
 			if(player.getName().equals(mdplayer.nickname)) return mdplayer;
 		}
