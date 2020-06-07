@@ -40,6 +40,7 @@ public class ModeManager implements Listener {
 	public static ModeShiftyGround SHIFTY_GROUND = new ModeShiftyGround();
 	public static ModeAnvilFall ANVIL_FALL = new ModeAnvilFall();
 	public static ModeStruggle STRUGGLE = new ModeStruggle();
+	public static ModeFloorCrack FLOOR_CRACK = new ModeFloorCrack();
 
 	public static List<Mode> getModes() {
 		return modes;
