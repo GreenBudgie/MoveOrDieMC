@@ -8,49 +8,51 @@ import org.bukkit.block.data.Directional;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import ru.game.PlayerHandler;
 import ru.game.WorldManager;
 import ru.map.GameMap;
-import ru.map.MapManager;
 import ru.util.MathUtils;
 import ru.util.Region;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class ModeAnvilFall extends Mode implements Listener {
+public class ModeTNTFall extends Mode implements Listener {
 
-	private Map<GameMap, Region> anvilSpawnRegion = new HashMap<>();
-	private final int maxDelay = 20, minDelay = 3, maxCount = 10, minCount = 2;
+	private Map<GameMap, Region> tntSpawnRegion = new HashMap<>();
+	private final int maxDelay = 40, minDelay = 10, maxCount = 6, minCount = 1;
 	private float count, delay, prevDelay;
 
 	@Override
 	public String getName() {
-		return "Наковальнепад";
+		return "Небесные Взрывы";
 	}
 
 	@Override
 	public String getDescription() {
-		return "С неба падают наковальни! Самое сложное - не запутаться в них. К тому же, они могут тебя расплющить.";
+		return "С неба падает динамит! Старайся не взорваться как можно дольше";
 	}
 
 	@Override
 	public Material getItemToShow() {
-		return Material.ANVIL;
+		return Material.TNT;
 	}
 
 	@Override
 	public String getID() {
-		return "ANVIL_FALL";
+		return "TNT_FALL";
 	}
 
 	@Override
 	public void deserializeMapOptions(GameMap map, ConfigurationSection options) {
 		Region region = Region.deserialize(options.getValues(false));
-		anvilSpawnRegion.put(map, region);
+		tntSpawnRegion.put(map, region);
 	}
 
 	@Override
@@ -60,41 +62,32 @@ public class ModeAnvilFall extends Mode implements Listener {
 		count = minCount;
 	}
 
-	private static void randomlyRotate(Block block) {
-		Directional data = (Directional) block.getBlockData();
-		data.setFacing(MathUtils.choose(BlockFace.WEST, BlockFace.EAST, BlockFace.SOUTH, BlockFace.NORTH));
-		block.setBlockData(data);
-	}
-
 	@Override
 	public void update() {
 		if(delay <= 0) {
-			Region anvilRegion = anvilSpawnRegion.get(map);
-			for(int i = 0; i < count; i++) {
-				Location spawn = anvilRegion.getRandomInsideBlockLocation();
+			Region tntRegion = tntSpawnRegion.get(map);
+			for(int i = 0; i < Math.floor(count); i++) {
+				Location spawn = tntRegion.getRandomInsideBlockLocation();
 				spawn.setWorld(WorldManager.getCurrentGameWorld());
-				Block block = spawn.getBlock();
-				if(block.getType() != Material.ANVIL) {
-					block.setType(Material.ANVIL);
-					randomlyRotate(block);
-				}
+				TNTPrimed tnt = (TNTPrimed) spawn.getWorld().spawnEntity(spawn.clone().add(0.5, 0.5, 0.5), EntityType.PRIMED_TNT);
+				tnt.setFuseTicks(MathUtils.randomRange(20, 80));
 			}
-			delay = Math.max(prevDelay - (float) MathUtils.randomRangeDouble(0.1, 0.3), minDelay);
+			delay = Math.max(prevDelay - (float) MathUtils.randomRangeDouble(0.1, 0.25), minDelay);
 			prevDelay = delay;
-			count = Math.min(count + (float) MathUtils.randomRangeDouble(0.1, 0.3), maxCount);
+			count = Math.min(count + (float) MathUtils.randomRangeDouble(0.05, 0.15), maxCount);
 		} else {
 			delay -= 1;
 		}
 	}
 
 	@EventHandler
-	public void anvilDamage(EntityDamageEvent e) {
-		if(e.getEntityType() == EntityType.PLAYER && e.getCause() == EntityDamageEvent.DamageCause.FALLING_BLOCK) {
-			Player player = (Player) e.getEntity();
-			if(PlayerHandler.isPlaying(player)) {
-				e.setDamage(100);
-			}
-		}
+	public void tntExplode(EntityExplodeEvent e) {
+		e.setYield(e.getYield() / 2F);
+	}
+
+	@EventHandler
+	public void tntExplode(BlockExplodeEvent e) {
+		e.setYield(e.getYield() / 2F);
 	}
 
 	@Override

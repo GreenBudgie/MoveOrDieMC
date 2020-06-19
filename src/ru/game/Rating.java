@@ -70,23 +70,23 @@ public enum Rating {
 		return getRegisteredNames().contains(name);
 	}
 
-	public static List<String> getRoundWinRateLadder() {
+	public static List<String> getRoundWinRateLadder(boolean round) {
 		List<String> names = Lists.newArrayList(getRegisteredNames());
-		names.sort(Comparator.comparingDouble(Rating::getRoundWinRate));
+		names.sort(Comparator.comparingDouble(round ? Rating::getRoundWinRate : Rating::getGameWinRate).reversed());
 		return names;
 	}
 
-	public static void printLadder(Player player) {
+	public static void printLadder(Player player, boolean round) {
 		if(getRegisteredNames().isEmpty()) {
 			player.sendMessage(ChatColor.DARK_RED + "" + ChatColor.BOLD + "Нет информации");
 			return;
 		}
-		player.sendMessage(ChatColor.DARK_AQUA + "Рейтинг игроков по" + ChatColor.BOLD + " винрейту раундов" + ChatColor.RESET + ChatColor.GRAY + ":");
-		List<String> ladder = getRoundWinRateLadder();
+		player.sendMessage(ChatColor.DARK_AQUA + "Рейтинг игроков по" + ChatColor.BOLD + " винрейту " + (round ? "раундов" : "игр")+ ChatColor.RESET + ChatColor.GRAY + ":");
+		List<String> ladder = getRoundWinRateLadder(round);
 		for(int i = 0; i < ladder.size(); i++) {
 			String name = ladder.get(i);
 			player.sendMessage(ChatColor.DARK_GREEN + "#" + ChatColor.GREEN + (i + 1) + ChatColor.GOLD + " " + name + ChatColor.GRAY + ", " +
-					ChatColor.AQUA + ChatColor.BOLD + (int) (getRoundWinRate(name) * 100) + ChatColor.DARK_AQUA + "%");
+					ChatColor.AQUA + ChatColor.BOLD + (int) ((round ? getRoundWinRate(name) : getGameWinRate(name)) * 100) + ChatColor.DARK_AQUA + "%");
 		}
 	}
 

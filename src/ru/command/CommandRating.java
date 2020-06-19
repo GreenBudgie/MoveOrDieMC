@@ -16,18 +16,24 @@ public class CommandRating implements CommandExecutor, TabCompleter {
 
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		Player player = (Player) sender;
-		if(args.length == 0) {
-			Rating.printLadder(player);
+		if(args.length >= 2 && args[0].equalsIgnoreCase("player")) {
+			Rating.printRating(player, args[1]);
+			return true;
 		}
-		if(args.length >= 1) {
-			Rating.printRating(player, args[0]);
+		boolean round = true;
+		if(args.length >= 1 && args[0].equalsIgnoreCase("game")) {
+			round = false;
 		}
+		Rating.printLadder(player, round);
 		return true;
 	}
 
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
 		if(args.length == 1) {
+			return CommandMoveOrDie.getMatchingStrings(args, "game", "round", "player");
+		}
+		if(args.length == 2) {
 			return CommandMoveOrDie.getMatchingStrings(args, Lists.newArrayList(Rating.getRegisteredNames()));
 		}
 		return null;
