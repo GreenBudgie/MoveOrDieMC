@@ -26,7 +26,7 @@ import java.util.Map;
 public class ModeTNTFall extends Mode implements Listener {
 
 	private Map<GameMap, Region> tntSpawnRegion = new HashMap<>();
-	private final int maxDelay = 40, minDelay = 10, maxCount = 6, minCount = 1;
+	private final int maxDelay = 35, minDelay = 8, maxCount = 7, minCount = 2;
 	private float count, delay, prevDelay;
 
 	@Override

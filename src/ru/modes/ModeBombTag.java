@@ -154,6 +154,7 @@ public class ModeBombTag extends Mode implements Listener {
 			delayToExplode = 0;
 			delayToPickNew = maxDelayToPickNew;
 			tagged = null;
+			resetCountdown();
 		}
 		deathByExplosion = false;
 	}
