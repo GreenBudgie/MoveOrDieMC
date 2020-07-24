@@ -1,23 +1,15 @@
 package ru.util;
 
 import com.google.common.collect.ListMultimap;
-import de.slikey.effectlib.Effect;
-import de.slikey.effectlib.EffectManager;
-import de.slikey.effectlib.EffectType;
-import de.slikey.effectlib.effect.LineEffect;
-import org.bukkit.ChatColor;
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Particle;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
+import org.bukkit.util.Vector;
 
 import javax.annotation.Nullable;
 import java.util.List;
 
 public class ParticleUtils {
-
-	public static EffectManager effectManager;
 
 	/**
 	 * Creates particles on the edges of the given region
@@ -84,19 +76,22 @@ public class ParticleUtils {
 	 * @param from Line start location
 	 * @param to Line end location
 	 * @param particle A particle to create
-	 * @param color Color of a particle, can be null
+	 * @param color Color of a particle, might be null
 	 * @param density How much particles to spawn per block
 	 */
 	public static void createLine(Location from, Location to, Particle particle, double density, @Nullable Color color) {
 		if(from.getWorld() != to.getWorld()) throw new IllegalArgumentException("Locations must be in the same world!");
-		LineEffect effect = new LineEffect(effectManager);
-		effect.setLocation(from);
-		effect.setTargetLocation(to);
-		effect.particles = (int) Math.round(from.distance(to) * density);
-		effect.particle = particle;
-		effect.iterations = 1;
-		if(color != null) effect.color = color;
-		effect.start();
+		Vector vector = to.toVector().subtract(from.toVector()); //Setting up a from-to vector
+		vector.normalize(); //Converting to a unit vector to apply density
+		double length = from.distance(to);
+		int particleCount = (int) Math.round(length * density);
+		Vector shift = vector.multiply(1D / density);
+		Location currentLocation = from.clone();
+
+		for(int i = 0; i < particleCount; i++) {
+			createParticle(currentLocation, particle, color);
+			currentLocation.add(shift);
+		}
 	}
 
 	/**
@@ -126,23 +121,44 @@ public class ParticleUtils {
 	}
 
 	/**
+	 * Determines if the particle can be colorized
+	 * @param particle Particle to check
+	 * @return Whether the particle has a color option
+	 */
+	public static boolean hasColor(Particle particle) {
+		return particle == Particle.REDSTONE || particle == Particle.SPELL_MOB || particle == Particle.SPELL_MOB_AMBIENT;
+	}
+
+	/**
 	 * Creates a single particle at the given location
 	 * @param location The location
 	 * @param particle A particle to create
-	 * @param color Color of a particle, can be null
+	 * @param color Color of a particle, might be null
 	 */
 	public static void createParticle(Location location, Particle particle, @Nullable Color color) {
-		if(color == null) {
-			location.getWorld().spawnParticle(particle, location,1, 0, 0, 0, 0);
-			return;
+		World world = location.getWorld();
+		if(world == null) return;
+		if(color == null || !hasColor(particle)) {
+			world.spawnParticle(particle, location,1, 0, 0, 0, 0);
+		} else {
+			if(particle == Particle.REDSTONE) {
+				Particle.DustOptions dustOptions = new Particle.DustOptions(color, 1);
+				world.spawnParticle(particle, location, 1, dustOptions);
+			}
+			if(particle == Particle.SPELL_MOB || particle == Particle.SPELL_MOB_AMBIENT) {
+				double red = color.getRed() / 255D;
+				double green = color.getGreen() / 255D;
+				double blue = color.getBlue() / 255D;
+				world.spawnParticle(particle, location, 0, red, green, blue, 1);
+			}
 		}
-		ParticleEffectPoint effect = new ParticleEffectPoint();
+		/*ParticleEffectPoint effect = new ParticleEffectPoint();
 		effect.setLocation(location);
 		effect.type = EffectType.INSTANT;
 		effect.particle = particle;
 		effect.iterations = 1;
 		if(color != null) effect.color = color;
-		effect.start();
+		effect.start();*/
 	}
 
 	public static void createParticlesAround(Entity ent, Particle effect, Color color, int amount) {
@@ -184,14 +200,13 @@ public class ParticleUtils {
 		}
 	}
 
-	public static void createParticlesInRange(Location l, double radius, Particle effect, Color color, int amount) {
+	public static void createParticlesInRange(Location l, double radius, Particle particle, Color color, int amount) {
 		for(int i = 0; i < amount; i++) {
-			ParticleEffectPoint ef = new ParticleEffectPoint();
-			ef.particle = effect;
-			if(color != null) ef.color = color;
-			ef.setLocation(
-					l.clone().add(MathUtils.randomRangeDouble(-radius, radius), MathUtils.randomRangeDouble(-radius, radius), MathUtils.randomRangeDouble(-radius, radius)));
-			ef.start();
+			createParticle(l.clone().add(
+						MathUtils.randomRangeDouble(-radius, radius),
+						MathUtils.randomRangeDouble(-radius, radius),
+						MathUtils.randomRangeDouble(-radius, radius)),
+					particle, color);
 		}
 	}
 
@@ -341,24 +356,6 @@ public class ParticleUtils {
 			return Color.TEAL;
 		}
 		return null;
-	}
-
-	private static class ParticleEffectPoint extends Effect {
-
-		public Particle particle = Particle.REDSTONE;
-		public int amount = 1;
-
-		public ParticleEffectPoint() {
-			super(ParticleUtils.effectManager);
-			type = EffectType.INSTANT;
-			visibleRange = 128F;
-		}
-
-		@Override
-		public void onRun() {
-			this.display(particle, this.getLocation(), color, 0, amount);
-		}
-
 	}
 
 }

@@ -1,6 +1,5 @@
 package ru.start;
 
-import de.slikey.effectlib.EffectManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import ru.command.*;
 import ru.game.GameState;
@@ -23,15 +22,12 @@ public class Plugin extends JavaPlugin {
 		getCommand("rating").setExecutor(new CommandRating());
 		getCommand("opstat").setExecutor(new CommandOpStat());
 
-
-		ParticleUtils.effectManager = new EffectManager(this);
 		MoveOrDie.init();
 	}
 
 	public void onDisable() {
 		if(GameState.isPlaying()) MoveOrDie.endGame();
 		Rating.save();
-		ParticleUtils.effectManager.dispose();
 	}
 
 }

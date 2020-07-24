@@ -1,7 +1,7 @@
 name: MoveOrDie
 main: ru.start.Plugin
 api-version: 1.15
-version: 0.1 Alpha
+version: 0.2 Alpha
 commands:
   gm:
     description: Fast gamemode switch
