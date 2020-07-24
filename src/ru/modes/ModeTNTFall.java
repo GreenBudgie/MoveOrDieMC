@@ -5,6 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Directional;
+import org.bukkit.block.data.type.TNT;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -36,7 +37,7 @@ public class ModeTNTFall extends Mode implements Listener {
 
 	@Override
 	public String getDescription() {
-		return "— неба падает динамит! —тарайс€ не взорватьс€ как можно дольше";
+		return "— неба падает динамит и взрываетс€, когда падает на землю! —тарайс€ прожить как можно дольше";
 	}
 
 	@Override
@@ -70,13 +71,18 @@ public class ModeTNTFall extends Mode implements Listener {
 				Location spawn = tntRegion.getRandomInsideBlockLocation();
 				spawn.setWorld(WorldManager.getCurrentGameWorld());
 				TNTPrimed tnt = (TNTPrimed) spawn.getWorld().spawnEntity(spawn.clone().add(0.5, 0.5, 0.5), EntityType.PRIMED_TNT);
-				tnt.setFuseTicks(MathUtils.randomRange(20, 80));
+				tnt.setFuseTicks(200);
 			}
 			delay = Math.max(prevDelay - (float) MathUtils.randomRangeDouble(0.1, 0.25), minDelay);
 			prevDelay = delay;
 			count = Math.min(count + (float) MathUtils.randomRangeDouble(0.05, 0.15), maxCount);
 		} else {
 			delay -= 1;
+		}
+		for(TNTPrimed tnt : WorldManager.getCurrentGameWorld().getEntitiesByClass(TNTPrimed.class)) {
+			if(tnt.isOnGround()) {
+				tnt.setFuseTicks(1);
+			}
 		}
 	}
 
